@@ -1,5 +1,3 @@
-
-
 $("#btnOne").click(function() {
 
         $.ajax({
