@@ -1,1 +1,72 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API App</title>
+    <link href="favicon.ico" rel="icon">
+    <link rel="stylesheet" href="libs/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+    <table>
+        <tr>        
+            <th colspan="3">API</th>
+        </tr>
+            <tr>
+                <th>API name</th>
+                <th>API description</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>Earthquakes</td>
+                <td>
+                    <p>Returns a list of recent earthquakes, ordered by magnitude. Please, enter the north, south, east and west coordinates.</p>
+                    <label for="north">North:</label>
+                    <input type="number" id="north" name="north">
+                    <label for="south">South:</label>
+                    <input type="number" id="south" name="south">
+                    <label for="east">East:</label>
+                    <input type="number" id="east" name="east">
+                    <label for="West">West:</label>
+                    <input type="number" id="west" name="west">
+                </td>
+                <td><button id="btnOne">Submit</button></td>
+            </tr>
+            <tr>
+                <td>Weather Station with most recent weather observation</td>
+                <td>Returns the weather station and the most recent weather observation for the ICAO code.
+                </td>
+                <td><button id="btnTwo">Submit</button></td>
+            </tr>
+            <tr>
+                <td>Timezone</td>
+                <td>Returns the timezone.</td>
+                <td><button id="btnThree">Submit</button></td>
+            </tr>
+            <tr>
+                <td colspan="3" id="apiResults">Results</td>
+                <tr>
+                    <td colspan="3">
+                    <p id="datetime"></p>
+                    <p id="depth"></p>
+                    <p id="lng"></p>
+                    <p id="src"></p>
+                    <p id="eqid"></p>
+                    <p id="magnitude"></p>
+                    <p id="lat"></p>
+                </td>
+                </tr>
+            </tr>
+    </table>
+</div>
+
+<script type="application/javascript" src="libs/js/jquery-2.2.3.min.js"></script>
+<script type="application/javascript" src="libs/js/script.js"></script>
+
+</body>
+</html>
