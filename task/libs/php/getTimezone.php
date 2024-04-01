@@ -5,10 +5,10 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-$lat = $_REQUEST['lat'];
-$lng = $_REQUEST['lng'];
-
-$url = 'http://api.geonames.org/timezoneJSON?lat=' . $lat . '&lng=' . $lng . '&date=2024-01-01&lang=en';
+$url = 'http://api.geonames.org/timezoneJSON?' .
+    'lat=' . $_REQUEST['lat'] .
+    '&lng=' . $_REQUEST['lng'] .
+    '&username=tanikolo';
 
 $ch = curl_init();
 
@@ -26,7 +26,7 @@ $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data'] = $decode;
+$output['data'] = $decode['timezone'];
 
 header('Content-Type: application/json; charset=UTF-8');
 
