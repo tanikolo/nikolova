@@ -32,20 +32,20 @@ $("#btnOne").click(function() {
 $("#btnTwo").click(function() {
 
     $.ajax({
-        url: 'libs/php/getWeather.php',
+        url: 'libs/php/getOceans.php',
         type: 'POST',
         dataType: 'json',
         data: {
-            clouds: "",
-            datetime: "yyyy-MM-dd",
-            temperature: "",
-            stationName: ""
+            latitude: $("#latitude").val(),
+            longitude: $("#longitude").val()
         },
         success: function(result) {
-            console.log(result);
+            console.log(JSON.stringify(result));
             
             if (result.status.name == "ok") {
-            $('#apiResults').html('<td colspan="3">' + result.data + '</td>');
+                    $('#geonameId').html(result['data'][0]['geonameId']);
+                    $('#name').html(result['data'][0]['name']);
+                    $('#distance').html(result['data'][0]['distance']);
         }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -61,16 +61,18 @@ $("#btnThree").click(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-            sunrise: "yyyy-MM-dd",
-            sunset: "yyyy-MM-dd",
-            countryName: "",
-            time: "yyyy-MM-dd"
+            latitude: $("#lat").val(),
+            longitude: $("#lng").val()
         },
         success: function(result) {
-            console.log(result);
+            console.log(JSON.stringify(result));
             
             if (result.status.name == "ok") {
-            $('#apiResults').html('<td colspan="3">' + result.data + '</td>');
+                    $('#sunrise').html(result['data'][0]['sunrise']);
+                    $('#sunset').html(result['data'][0]['sunset']);
+                    $('#timezoneId').html(result['data'][0]['timezoneId']);
+                    $('#countryName').html(result['data'][0]['countryName']);
+                    $('#time').html(result['data'][0]['time']);
         }
         },
         error: function(jqXHR, textStatus, errorThrown) {
