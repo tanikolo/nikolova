@@ -6,8 +6,8 @@ error_reporting(E_ALL);
 $executionStartTime = microtime(true);
 
 $url = 'http://api.geonames.org/timezoneJSON?' .
-    'lat=' . $_REQUEST['lat'] .
-    '&lng=' . $_REQUEST['lng'] .
+    'lat=' . $_REQUEST['timezoneLat'] .
+    '&lng=' . $_REQUEST['timezoneLng'] .
     '&username=tanikolo';
 
 $ch = curl_init();
