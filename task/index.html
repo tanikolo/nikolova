@@ -39,10 +39,10 @@
             <tr>
                <td>Ocean / Reverse geocoding</td>
                <td><p>Returns the ocean or sea for the given latitude/longitude.</p>
-                  <label for="lat">Latitude:</label>
-                  <input type="number" id="latitude" name="lat">
-                  <label for="lng">Longitude:</label>
-                  <input type="number" id="longitude" name="lng">
+                  <label for="oceanLat">Latitude:</label>
+                  <input type="number" id="oceanLat" name="oceanLatitude">
+                  <label for="oceanLng">Longitude:</label>
+                  <input type="number" id="oceanLng" name="oceanLongitude">
                </td>
                <td><button id="btnTwo">Submit</button></td>
             </tr>
@@ -50,10 +50,10 @@
                <td>Timezone</td>
                <td>
                   <p>Returns the timezone. Please, enter the latitude and longitude coordinates.</p>
-                  <label for="lat">Latitude:</label>
-                  <input type="number" id="lat" name="lat">
-                  <label for="lng">Longitude:</label>
-                  <input type="number" id="lng" name="lng">
+                  <label for="timezoneLat">Latitude:</label>
+                    <input type="number" id="timezoneLat" name="timezoneLatitude">
+                    <label for="timezoneLng">Longitude:</label>
+                    <input type="number" id="timezoneLng" name="timezoneLongitude">
                   </p>
                </td>
                <td><button id="btnThree">Submit</button></td>
@@ -64,11 +64,9 @@
                <td colspan="3">
                   <p id="datetime"></p>
                   <p id="depth"></p>
-                  <p id="lng"></p>
                   <p id="src"></p>
                   <p id="eqid"></p>
                   <p id="magnitude"></p>
-                  <p id="lat"></p>
                </td>
             </tr>
             <tr>
@@ -82,7 +80,6 @@
                <td colspan="3">
                   <p id="sunrise"></p>
                   <p id="sunset"></p>
-                  <p id="timezoneId"></p>
                   <p id="countryName"></p>
                   <p id="time"></p>
                </td>
