@@ -36,16 +36,16 @@ $("#btnTwo").click(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-            latitude: $("#latitude").val(),
-            longitude: $("#longitude").val()
+            latitude: $("#oceanLat").val(),
+            longitude: $("#oceanLng").val()
         },
         success: function(result) {
             console.log(JSON.stringify(result));
             
             if (result.status.name == "ok") {
-                    $('#geonameId').html(result['data'][0]['geonameId']);
-                    $('#name').html(result['data'][0]['name']);
-                    $('#distance').html(result['data'][0]['distance']);
+                    $('#geonameId').html(result['data']['geonameId']);
+                    $('#name').html(result['data']['name']);
+                    $('#distance').html(result['data']['distance']);
         }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -61,18 +61,17 @@ $("#btnThree").click(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-            latitude: $("#lat").val(),
-            longitude: $("#lng").val()
+            latitude: $("#timezoneLat").val(),
+            longitude: $("#timezoneLng").val()
         },
         success: function(result) {
             console.log(JSON.stringify(result));
             
             if (result.status.name == "ok") {
-                    $('#sunrise').html(result['data'][0]['sunrise']);
-                    $('#sunset').html(result['data'][0]['sunset']);
-                    $('#timezoneId').html(result['data'][0]['timezoneId']);
-                    $('#countryName').html(result['data'][0]['countryName']);
-                    $('#time').html(result['data'][0]['time']);
+                    $('#sunrise').html(result['data']['sunrise']);
+                    $('#sunset').html(result['data']['sunset']);
+                    $('#countryName').html(result['data']['countryName']);
+                    $('#time').html(result['data']['time']);
         }
         },
         error: function(jqXHR, textStatus, errorThrown) {
