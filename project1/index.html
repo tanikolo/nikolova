@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Defines the character encoding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsive design -->
+    <title>GAZETTEER</title> <!-- Page title -->
 
+    <link rel="icon" href="/img/favicon.png"> <!-- Favicon for browser tab -->
+
+    <!-- Load local Bootstrap CSS -->
+    <link rel="stylesheet" href="libs/css/bootstrap/css/bootstrap.css"> 
+    
+
+
+
+    <!-- Load Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/bdf40bcb56.js" crossorigin="anonymous"></script> 
+
+    <!-- Load Leaflet CSS and JS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin="anonymous"/>
+    
+
+         <!-- Load custom styles -->
+    <link rel="stylesheet" href="libs/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div id="preloader"></div>
+
+    <nav class="navbar navbar-dark bg-dark">
+
+      <!-- Левый конец: nav-logo и nav-item -->
+      <div class="d-flex align-items-center"> 
+          <img class="nav-logo" src="img/globe.png" alt="Gazetteer" style="width: 25px; height: 25px;">
+          <p class="nav-item text-warning">GAZETTEER</p>
+      </div>
+  
+      <!-- Правый конец: элемент select -->
+      <div class="d-flex align-items-center"> 
+          <select class="custom-select select-item w-auto border border-warning bg-warning" id="country" required="">
+              <option value="">Choose a country...</option>
+              <option>United States</option>
+          </select>
+      </div>
+  
+  </nav>
+  
+
+    <div id="map"></div>
+
+    <div class="btn-container d-flex flex-column">
+
+        <!-- Button Info -->
+<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalInfo">
+    <i class="fa-solid fa-circle-info"></i>
+  </button>
+  
+  <!-- Modal Info -->
+  <div class="modal fade" id="modalInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalInfoLabel">Country Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Button Weather -->
+<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalWeather">
+    <i class="fa-regular fa-sun"></i>
+  </button>
+  
+  <!-- Modal Weather-->
+  <div class="modal fade" id="modalWeather" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalWeatherLabel">Weather Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Button Currency -->
+<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalCurrency">
+    <i class="fa-solid fa-coins"></i>
+  </button>
+  
+  <!-- Modal Currency-->
+  <div class="modal fade" id="modalCurrency" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCurrencyLabel">Currency Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Button Places -->
+<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPlaces">
+    <i class="fa-regular fa-image"></i>
+  </button>
+  
+  <!-- Modal Places-->
+  <div class="modal fade" id="modalPlaces" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalPlacesLabel">Country Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="libs/js/jquery-3.7.1.js"></script>
+<script src="libs/js/jquery-3.7.1.min.js"></script>
+<script src="libs/css/bootstrap/js/bootstrap.bundle.min.js"></script>  
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin="anonymous"></script>
+    <script src="libs/js/script.js"></script>
+</body>
+</html>
