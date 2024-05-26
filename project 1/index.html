@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAZETTEER</title>
-
-    <link rel="icon" href="/img/favicon.png"> 
-
-    <link rel="stylesheet" href="vendors/leaflet/leaflet.css">
+	
+  	<link rel="icon" href="vendors/img/globe.png">
 
     <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css">
 
@@ -15,356 +13,216 @@
 
     <link rel="stylesheet" href="vendors/leaflet/leaflet.css">
 
-    <link rel="stylesheet" href="vendors/Leaflet.EasyButton/src/easy-button.css">
+    <link rel="stylesheet" href="vendors/LeafletEasyButton/src/easy-button.css">
+  
+  	<link rel="stylesheet" href="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.css">
+  
+  	<link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.css">
+  
+  	<link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.Default.css">
 
     <link rel="stylesheet" href="libs/css/style.css">
-
+  
+  	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
    
 </head>
 <body>
     <span id="selectContainer">
         <select id="countrySelect" class="form-select shadow-sm">
-          <!-- populate from an AJAX CALL to a PHP routine that returns a JSON object that is an array of just ISO codes and names from countryBorders.geo.json -->
-          <option value="AF">Select country...</option>
+          <option value="">Select country...</option>
         </select>
       </span>
       
       <div id="map"></div>
       
-      <!-- example modal layout -->
-      
       <div id="modalInfo" class="modal" data-bs-backdrop="false" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content shadow">
-            <div class="modal-header bg-success bg-gradient text-white">
-              <h5 class="modal-title">Overview</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-info bg-gradient text-white">
+                <h5 class="modal-title">Country Overview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <table class="table table-striped">
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-street-view fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Country Name:
-                  </td>
-      
-                  <td class="text-end" id="country">
-                    
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-heart fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Capital:
-                  </td>
-      
-                  <td class="text-end" id="capital">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-car fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Continent:
-                  </td>
-      
-                  <td class="text-end" id="continent">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-book fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Population:
-                  </td>
-      
-                  <td class="text-end" id="population">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-bath fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Language:
-                  </td>
-      
-                  <td class="text-end" id="languages">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-bell fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Currency
-                  </td>
-      
-                  <td class="text-end" id="currency">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-anchor fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Area in SqKm:
-                  </td>
-      
-                  <td class="text-end" id="area">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-money-bill fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-wifi fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-globe fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-bicycle fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-landmark fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-tree fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-      
-                  <td class="text-center">
-                    <i class="fa-solid fa-bookmark fa-xl text-success"></i>
-                  </td>
-      
-                  <td>
-                    Attribute
-                  </td>
-      
-                  <td class="text-end">
-                    value
-                  </td>
-      
-                </tr>
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-bell fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr> 
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-fire fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr>           
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-key fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr> 
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-newspaper fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr> 
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-rocket fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr> 
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-wheelchair fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr> 
-                <tr>
-                  
-                  <td class="text-center">
-                    <i class="fa-solid fa-monument fa-xl text-success"></i>
-                  </td>
-                  
-                  <td>
-                    Attribute
-                  </td>
-                  
-                  <td class="text-end">
-                    value
-                  </td>
-                  
-                </tr>           
-              </table>
+                <table class="table table-striped">
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-globe fa-xl text-warning"></i>
+                        </td>
+                        <td>Country Name:</td>
+                        <td class="text-end" id="countryName"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-landmark-flag fa-xl text-warning"></i>
+                        </td>
+                        <td>Capital:</td>
+                        <td class="text-end" id="capital"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-earth-europe fa-xl text-warning"></i>
+                        </td>
+                        <td>Continent:</td>
+                        <td class="text-end" id="continent"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-people-group fa-xl text-warning"></i>
+                        </td>
+                        <td>Population:</td>
+                        <td class="text-end" id="population"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-language fa-xl text-warning"></i>
+                        </td>
+                        <td>Language:</td>
+                        <td class="text-end" id="languages"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-money-bill-1 fa-xl text-warning"></i>
+                        </td>
+                        <td>Currency</td>
+                        <td class="text-end" id="currency"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <i class="fa-solid fa-expand fa-xl text-warning"></i>
+                        </td>
+                        <td>Area in SqKm:</td>
+                        <td class="text-end" id="area"></td>
+                    </tr>
+                </table>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="wikiModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-info bg-gradient text-white">
+                <h5 class="modal-title" id="wikiTitle">Wikipedia Information</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body bg-warning">
+                <img id="countryFlag" src="" alt="Country Flag" class="img-fluid mb-3 border border-white rounded" style="display: block; margin-left: auto; margin-right: auto;">
+                <p id="wikiSummary" class="text-justify">Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<div class="modal fade" id="modalWeather" tabindex="-1" aria-labelledby="modalWeatherLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-info text-center">
+      <div class="modal-header border-0 bg-info text-white">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-white">
+        <div id="weatherInfo">
+          <div id="currentWeather">
+            <h3 id="cityName"></h3>
+            <p id="currentDay"></p>
+            <h2 id="currentTemp"></h2>
+            <p id="feelsLikeTemp"></p>
+            <p id="currentConditions"></p>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+  
+<div class="modal fade" id="currencyModal" tabindex="-1" aria-labelledby="currencyModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content bg-info">
+         <div class="modal-header border-0 bg-warning text-white">
+            <h5 class="modal-title">Currency Converter</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body text-white">
+            <form id="currency-form">
+               <div class="form-group mb-3">
+                  <label for="amount">Enter Amount</label>
+                  <input type="number" class="form-control" id="amount" value="1">
+               </div>
+               <div class="row mb-3">
+                  <div class="col-md-5">
+                     <label for="from-currency">From</label>
+                     <div>
+                        <input id="from-currency" class="form-control" type="text" value="" aria-label="Currency input" readonly>
+                     </div>
+                  </div>
+                  <div class="col-md-2 text-center align-self-center">
+                     <i class="fas fa-exchange-alt text-info"></i>
+                  </div>
+                  <div class="col-md-5">
+                     <label for="to-currency">To</label>
+                     <div class="input">
+                        <select id="to-currency" class="form-select shadow-sm">
+                           <option value=""></option>
+                        </select>
+                     </div>
+                  </div>
+               </div>
+               <div id="exchange-result" class="alert alert-warning text-center d-none"></div>
+               <div class="d-flex justify-content-center">
+                  <button type="button" class="btn btn-warning btn-block text-white" id="getRate">Get Exchange Rate</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+  
+<div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content bg-info">
+      <div class="modal-header border-0 bg-warning text-white">
+        <h5 class="modal-title" id="newsModalLabel">Latest News</h5>
+        <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="newsContent" class="text-justify">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content bg-info">
+      <div class="modal-header border-0 bg-warning text-white">
+        <h5 class="modal-title">About Gazetteer</h5>
+        <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-justify">
+        <p>Gazetteer is your comprehensive guide to exploring the world, using geolocation technology to provide tailored information about your surroundings. Discover detailed data about countries, view capital city info and weather, access the latest regional news, and find points of interest like airports, parks, museums, and hotels. Additionally, our interactive maps and built-in currency converter enhance your travel experience. Ensure location settings are enabled for the best results.</p>
+        <p class="text-center">Thank you for using Gazetteer!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="capitalModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-info bg-gradient text-white text-center">
+                <h5 class="modal-title" id="capitalTitle">Capital Information</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-warning">
+                <img id="capitalImage" src="" alt="Capital Image" class="img-fluid mb-3" style="display: block; margin-left: auto; margin-right: auto;">
+                <p id="capitalSummary" class="text-justify">Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
       <div id=”preloader”></div>
 
@@ -373,8 +231,10 @@
       <script src="vendors/leaflet/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin="anonymous"></script>
-      <script src="vendors/Leaflet.EasyButton/src/easy-button.js"></script>
-
+      <script src="vendors/LeafletEasyButton/src/easy-button.js"></script>
+  	  <script src="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.js"></script>
+  	  <script src="vendors/Leaflet.markercluster/leaflet.markercluster.js"></script>
+	  <script src="libs/js/numeral.min.js"></script>
       <script src="libs/js/script.js"></script>
 </body>
 
