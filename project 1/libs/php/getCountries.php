@@ -1,54 +1,38 @@
 <?php
 
-    // remove for production
+// Display errors for debugging
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-    ini_set('display_errors', 'On');
+$executionStartTime = microtime(true);
 
-    error_reporting(E_ALL);
+// Read the country borders geojson file
+$result = file_get_contents("countryBorders.geo.json");
 
+function compare($a, $b) {
+    return $a["name"] <=> $b["name"];
+}
 
-    $executionStartTime = microtime(true);
+$decode = json_decode($result, true);
+$countries = [];
 
-    $result = file_get_contents("countryBorders.geo.json");
+foreach ($decode['features'] as $feature) {
+    $countries[] = [
+        'code' => $feature['properties']['iso_a2'],
+        'name' => $feature['properties']['name']
+    ];
+}
 
-    function compare($a, $b) {
+usort($countries, "compare");
 
-        if ($a["name"] == $b["name"]) return 0;
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
+$output['data'] = $countries;
 
-        return ($a["name"] < $b["name"]) ? -1 : 1;
-
-    }
-
- 
-    $decode = json_decode($result,true);
-
-    $countries = [];
-
-    for ($i = 0; $i < count($decode['features']); $i++) {
-
-
-        array_push($countries,$decode['features'][$i]['properties']);
-
-
-    };
-
- 
-    usort($countries, "compare");
-
-
-    $output['status']['code'] = "200";
-
-    $output['status']['name'] = "ok";
-
-    $output['status']['description'] = "success";
-
-    $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-
-    $output['data'] = $countries;
-
-
-    header('Content-Type: application/json; charset=UTF-8');
-
-    echo json_encode($output);
-
+header('Content-Type: application/json; charset=UTF-8');
+echo json_encode($output);
 ?>
+
+

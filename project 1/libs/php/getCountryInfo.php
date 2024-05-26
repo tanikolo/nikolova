@@ -1,16 +1,16 @@
 <?php
 
-    // remove for production
-
+// Display errors for debugging
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
-
 $countryCode = $_GET['country'];
+$username = 'tanikolo'; 
 
 $executionStartTime = microtime(true);
 
-$url = "http://api.geonames.org/countryInfoJSON?formatted=true&lang=it&country=$countryCode&username=tanikolo&style=full";
+// Set language parameter to English
+$url = "http://api.geonames.org/countryInfoJSON?formatted=true&lang=en&country=$countryCode&username=$username";
 
 $ch = curl_init();
 
@@ -42,3 +42,6 @@ header('Content-Type: application/json; charset=UTF-8');
 echo json_encode($output);
 
 ?>
+
+
+
