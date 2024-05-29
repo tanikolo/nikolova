@@ -4,7 +4,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fromCurrency = $_POST['fromCurrency'];
     $toCurrency = $_POST['toCurrency'];
 
-    $app_id = '42452e2a086244a2a32af87e383e0a96'; // Replace with your Open Exchange Rates App ID
+    $app_id = '42452e2a086244a2a32af87e383e0a96'; 
 
     $url = "https://openexchangerates.org/api/latest.json?app_id={$app_id}&symbols={$fromCurrency},{$toCurrency}";
 
