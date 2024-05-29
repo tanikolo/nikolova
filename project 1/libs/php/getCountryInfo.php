@@ -1,6 +1,5 @@
 <?php
 
-// Display errors for debugging
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
@@ -9,7 +8,6 @@ $username = 'tanikolo';
 
 $executionStartTime = microtime(true);
 
-// Set language parameter to English
 $url = "http://api.geonames.org/countryInfoJSON?formatted=true&lang=en&country=$countryCode&username=$username";
 
 $ch = curl_init();
