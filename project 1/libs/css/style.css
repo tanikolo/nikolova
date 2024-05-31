@@ -32,11 +32,6 @@ body {
     background-color: #D2DE32;
 }
 
-.modal-header .modal-title {
-	flex: 1;
-	text-align: center;
-}
-
 .text-justify {
 	text-align: justify;
 }
