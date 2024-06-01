@@ -145,47 +145,34 @@
   </div>
 </div>
   
-<div class="modal fade" id="currencyModal" tabindex="-1" aria-labelledby="currencyModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content bg-info">
-         <div class="modal-header border-0 bg-warning text-white">
-            <h5 class="modal-title">Currency Converter</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body text-white">
-            <form id="currency-form">
-               <div class="form-group mb-3">
-                  <label for="amount">Enter Amount</label>
-                  <input type="number" class="form-control" id="amount" value="1">
-               </div>
-               <div class="row mb-3">
-                  <div class="col-md-5">
-                     <label for="from-currency">From</label>
-                     <div>
-                        <input id="from-currency" class="form-control" type="text" value="" aria-label="Currency input" readonly>
-                     </div>
-                  </div>
-                  <div class="col-md-2 text-center align-self-center">
-                     <i class="fas fa-exchange-alt text-info"></i>
-                  </div>
-                  <div class="col-md-5">
-                     <label for="to-currency">To</label>
-                     <div class="input">
-                        <select id="to-currency" class="form-select shadow-sm">
-                           <option value=""></option>
-                        </select>
-                     </div>
-                  </div>
-               </div>
-               <div id="exchange-result" class="alert alert-warning text-center d-none"></div>
-               <div class="d-flex justify-content-center">
-                  <button type="button" class="btn btn-warning btn-block text-white" id="getRate">Get Exchange Rate</button>
-               </div>
-            </form>
-         </div>
-      </div>
-   </div>
-</div>
+<div class="modal fade" id="currencyModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="currencyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-info">
+                <div class="modal-header border-0 bg-warning text-white">
+                    <h5 class="modal-title">Currency calculator</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-white">
+                    <form id="currency-form">
+                        <div class="form-floating mb-3">
+                            <input id="fromAmount" name="fromAmount" type="number" class="form-control" value="1" min="1" step="1">
+                            <label for="fromAmount">From USD</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select id="exchangeRate" name="exchangeRate" class="form-select">
+                                <option value=''></option>
+                            </select>
+                            <label for="exchangeRate">Convert to</label>
+                        </div>
+                        <div class="form-floating">
+                            <input id="toAmount" name="toAmount" type="text" class="form-control" disabled>
+                            <label for="toAmount">Result</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
   
 <div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-md">
