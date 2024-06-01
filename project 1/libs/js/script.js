@@ -858,73 +858,130 @@ function displayNews(articles) {
     }
 }
 
-    function populateFromCurrency() {
-        const detectedCurrency = $('#currency').text().trim(); 
-        console.log("Detected Currency: ", detectedCurrency); 
-        $('#from-currency').val(detectedCurrency);
-    }
-    
-    function populateToCurrency() {
-        $.ajax({
-            url: 'https://openexchangerates.org/api/currencies.json',
-            type: 'GET',
-            success: function (data) {
-                let options = '';
-                $.each(data, function (code, name) {
-                    options += `<option value="${code}">${name} (${code})</option>`;
-                });
-                $('#to-currency').html(options);
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching currencies:', error);
-            }
-        });
-    }
-    
-    function resetCurrencyDropdowns() {
-        $('#from-currency').val('');
-        $('#to-currency').empty();
-    }
-    
-    function clearPreviousData() {
-        $('#amount').val('1');
-        $('#exchange-result').addClass('d-none').removeClass('alert-info alert-danger').empty();
-    }
-    
     $('#currencyModal').on('show.bs.modal', function () {
-        resetCurrencyDropdowns(); 
-        populateFromCurrency();
-        populateToCurrency();
-        clearPreviousData(); 
-    });
-    
-    $('#getRate').click(function (e) {
-        e.preventDefault();
-        const amount = $('#amount').val();
-        const fromCurrency = $('#from-currency').val();
-        const toCurrency = $('#to-currency').val();
-    
-        $.ajax({
-            url: 'libs/php/getExchangeRates.php',
-            type: 'POST',
-            data: {
-                amount: amount,
-                fromCurrency: fromCurrency,
-                toCurrency: toCurrency
-            },
-            success: function (response) {
-                const result = JSON.parse(response);
-                if (result.error) {
-                    $('#exchange-result').removeClass('d-none').addClass('alert-danger').text('Error: ' + result.error);
-                } else {
-                    const rate = numeral(result.rate).format('0.00');
-                    const convertedAmount = numeral(result.convertedAmount).format('0.00');
-                    $('#exchange-result').removeClass('d-none alert-danger').addClass('alert-info text-center').html(`Exchange Rate: 1 ${fromCurrency} = ${rate} ${toCurrency}<br>Converted Amount: ${convertedAmount} ${toCurrency}`);
-                }
-            },
-            error: function (xhr, status, error) {
-                $('#exchange-result').removeClass('d-none').addClass('alert-danger').text('Error: ' + error);
-                console.log('Error:', error);
+    resetCurrencyForm();
+    const countryCode = detectedCountryCode || $('#countrySelect').val();
+    fetchCurrencies(countryCode);
+});
+
+$('#currency-form').on('submit', function (e) {
+    e.preventDefault();
+    convertCurrency();
+});
+
+$('#fromAmount').on('keyup', function () {
+    const from = "USD";
+    const to = $("#exchangeRate").val();
+    const amount = $("#fromAmount").val();
+    calResult(from, to, amount);
+});
+
+$('#fromAmount').on('change', function () {
+    const from = "USD";
+    const to = $("#exchangeRate").val();
+    const amount = $("#fromAmount").val();
+    calResult(from, to, amount);
+});
+
+$("#exchangeRate").change(function () {
+    const from = "USD";
+    const to = $("#exchangeRate").val();
+    calResult(from, to);
+});
+
+function resetCurrencyForm() {
+    $('#fromAmount').val(1);
+    $('#exchangeRate').val($('#exchangeRate option:first').val());
+    $('#toAmount').val('');
+}
+
+function fetchCurrencies(countryCode) {
+    $.ajax({
+        url: 'libs/php/getCurrencies.php?currencies=true',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            console.log('Fetched data:', data);
+            if (data.error) {
+                showToast(data.error, 4000, true, "#ffffff");
+            } else {
+                fetchCountryCurrency(countryCode, function (currencyCode) {
+                    populateCurrencySelect(data, currencyCode);
+                });
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            showToast('Error fetching currencies', 4000, true, "#ffffff");
+            console.log('Error details:', error);
+        }
     });
+}
+
+function fetchCountryCurrency(countryCode, callback) {
+    $.ajax({
+        url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+            if (result && result.length > 0) {
+                const countryInfo = result[0];
+                const currencyCode = Object.keys(countryInfo.currencies)[0];
+                callback(currencyCode);
+            } else {
+                callback(null);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log('Error fetching country currency:', error);
+            callback(null);
+        }
+    });
+}
+
+function populateCurrencySelect(currencies, countryCurrencyCode) {
+    const select = $('#exchangeRate');
+    select.empty();
+
+    $.each(currencies, function(code, name) {
+        console.log('Adding option:', code, name);
+        select.append($('<option>', { value: code, text: `${name} (${code})` }));
+    });
+
+    if (countryCurrencyCode) {
+        select.val(countryCurrencyCode);
+    } else {
+        select.val(select.find('option:first').val());
+    }
+
+    const from = "USD";
+    const to = select.val();
+    calResult(from, to);
+}
+
+function calResult(from, to, amount = 1) {
+    $.ajax({
+        url: 'libs/php/getExchangeRate.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { from: from, to: to, amount: amount },
+        success: function (result) {
+            if (result && result.convertedAmount) {
+                const convertedRate = numeral(result.convertedAmount).format("0,0.00");
+                $("#toAmount").val(convertedRate);
+            } else {
+                showToast('Error retrieving currency data', 4000, true, "#ffffff");
+            }
+        },
+        error: function (jqXHR, status, errorThrown) {
+            showToast('Error retrieving currency data', 4000, true, "#ffffff");
+        }
+    });
+}
+
+function convertCurrency() {
+    const from = "USD";
+    const to = $("#exchangeRate").val();
+    const amount = $("#fromAmount").val();
+    calResult(from, to, amount);
+    showToast("Conversion successful!", 4000, true, "#ffffff");
+}
