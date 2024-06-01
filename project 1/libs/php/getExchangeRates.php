@@ -1,11 +1,10 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $_POST['amount'];
-    $fromCurrency = $_POST['fromCurrency'];
-    $toCurrency = $_POST['toCurrency'];
+    $fromCurrency = $_POST['from'];
+    $toCurrency = $_POST['to'];
 
     $app_id = '42452e2a086244a2a32af87e383e0a96'; 
-
     $url = "https://openexchangerates.org/api/latest.json?app_id={$app_id}&symbols={$fromCurrency},{$toCurrency}";
 
     $ch = curl_init();
@@ -25,13 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'convertedAmount' => $convertedAmount,
         ]);
     } else {
-        echo json_encode([
-            'error' => 'Currency not found'
-        ]);
+        echo json_encode(['error' => 'Currency not found']);
     }
 } else {
-    echo json_encode([
-        'error' => 'Invalid request method'
-    ]);
+    echo json_encode(['error' => 'Invalid request method']);
 }
 ?>
