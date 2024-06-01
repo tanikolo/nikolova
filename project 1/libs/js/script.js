@@ -40,11 +40,63 @@ const hotelIcon = L.ExtraMarkers.icon({
     prefix: 'fa'
 });
 
-const airportsCG = L.markerClusterGroup();
-const parksCG = L.markerClusterGroup();
-const stadiumsCG = L.markerClusterGroup();
-const museumsCG = L.markerClusterGroup();
-const hotelsCG = L.markerClusterGroup();
+const airportsCG = L.markerClusterGroup({
+    polygonOptions: {
+        fillColor: "#0074D9",
+        color: "#001f3f",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.5
+    }
+});
+
+const parksCG = L.markerClusterGroup({
+    polygonOptions: {
+        fillColor: "#2ECC40",
+        color: "#0D632D",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.5
+    }
+});
+
+const stadiumsCG = L.markerClusterGroup({
+    polygonOptions: {
+        fillColor: "#FF851B",
+        color: "#B34700",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.5
+    }
+});
+
+const museumsCG = L.markerClusterGroup({
+    polygonOptions: {
+        fillColor: "#B10DC9",
+        color: "#5A005A",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.5
+    }
+});
+
+const hotelsCG = L.markerClusterGroup({
+    polygonOptions: {
+        fillColor: "#FFDC00",
+        color: "#B8860B",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.5
+    }
+});
+
+const overlays = {
+    Airports: airportsCG,
+    Parks: parksCG,
+    Stadiums: stadiumsCG,
+    Museums: museumsCG,
+    Hotels: hotelsCG
+};
 
 function initializeMap(accessToken) {
     map = L.map('map', {
