@@ -98,6 +98,24 @@ const overlays = {
     Hotels: hotelsCG
 };
 
+function showToast(message, duration, close) {
+    Toastify({
+        text: message,
+        duration: duration,
+        newWindow: true,
+        close: close,
+        gravity: "top",
+        position: "center",
+        stopOnFocus: true,
+        style: {
+            background: "#ffc007",
+            color: "#0E46A3",
+            borderRadius: "10px"
+        },
+        onClick: function () {}
+    }).showToast();
+}
+
 function initializeMap(accessToken) {
     map = L.map('map', {
         center: [48.7965913, 2.3210938],
