@@ -1,13 +1,20 @@
+$(window).on('load', function () {
+    if ($('#preloader').length) {
+        $('#preloader').delay(1000).fadeOut('slow', function () {
+            $(this).remove();
+        });
+    }
+});
 
 let map;
-let currentGeoJsonLayer = null; 
+let currentGeoJsonLayer = null;
 let countryBorders = null;
-let detectedCountryCode = null; 
-let detectedCountryName = null; 
-let capitalMarker = null; 
-let detectedLat = null; 
-let detectedLon = null; 
-let capitalName = null; 
+let detectedCountryCode = null;
+let detectedCountryName = null;
+let capitalMarker = null;
+let detectedLat = null;
+let detectedLon = null;
+let capitalName = null;
 
 const airportIcon = L.ExtraMarkers.icon({
     icon: 'fa-solid fa-plane',
@@ -104,17 +111,17 @@ function showToast(message, duration, close) {
         duration: duration,
         newWindow: true,
         close: close,
-        gravity: "top",
-        position: "center",
-        stopOnFocus: true,
+        gravity: "top", 
+        position: "center", 
+        stopOnFocus: true, 
         style: {
             background: "#ffc007",
             color: "#0E46A3",
             borderRadius: "10px"
         },
-        onClick: function () {}
-    }).showToast();
-}
+        onClick: function () {} 
+     }).showToast();
+ }
 
 function initializeMap(accessToken) {
     map = L.map('map', {
@@ -141,7 +148,7 @@ function initializeMap(accessToken) {
 
     baselayers['Terrain'].addTo(map);
 
-    L.control.layers(baselayers, null, {
+    L.control.layers(baselayers, overlays, {
         position: 'topright'
     }).addTo(map);
 
@@ -156,9 +163,8 @@ function initializeMap(accessToken) {
             icon: '<i class="fas fa-info-circle fa-responsive text-dark"></i>',
             title: 'Country Information',
             onClick: function () {
-                const countryCode = $('#countrySelect').val() || detectedCountryCode; 
+                const countryCode = $('#countrySelect').val() || detectedCountryCode;
                 showCountryInfo(countryCode);
-                console.log("Country code being sent: ", countryCode);
                 $('#modalInfo').modal('show');
             }
         }]
@@ -171,10 +177,9 @@ function initializeMap(accessToken) {
             icon: '<i class="fab fa-wikipedia-w fa-responsive text-dark"></i>',
             title: 'Wikipedia Information',
             onClick: function () {
-                const countryName = $('#countrySelect option:selected').text() !== "Select country..." ? $('#countrySelect option:selected').text() : detectedCountryName; 
-                const countryCode = $('#countrySelect').val() || detectedCountryCode; 
+                const countryName = $('#countrySelect option:selected').text() !== "Select country..." ? $('#countrySelect option:selected').text() : detectedCountryName;
+                const countryCode = $('#countrySelect').val() || detectedCountryCode;
                 fetchWikipediaSummary(countryName, countryCode);
-                console.log("Country name being sent: ", countryName);
                 $('#wikiModal').modal('show');
             }
         }]
@@ -188,9 +193,9 @@ function initializeMap(accessToken) {
             title: 'Weather Information',
             onClick: function () {
                 const countryCode = $('#countrySelect').val() || detectedCountryCode;
-                if (countryCode === detectedCountryCode) { 
+                if (countryCode === detectedCountryCode) {
                     fetchWeatherData(detectedLat, detectedLon, detectedCountryCode);
-                } else {  
+                } else {
                     $.ajax({
                         url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
                         type: 'GET',
@@ -200,7 +205,7 @@ function initializeMap(accessToken) {
                                 const countryInfo = result[0];
                                 const lat = countryInfo.latlng[0];
                                 const lon = countryInfo.latlng[1];
-                                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown'; 
+                                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown';
                                 fetchWeatherData(lat, lon, countryCode);
                             } else {
                                 console.error('No data found for country code:', countryCode);
@@ -211,7 +216,7 @@ function initializeMap(accessToken) {
                         }
                     });
                 }
-                $('#modalWeather').modal('show');
+                $('#weatherModal').modal('show');
             }
         }]
     }).addTo(map);
@@ -221,9 +226,9 @@ function initializeMap(accessToken) {
         states: [{
             stateName: 'show-currency-modal',
             icon: '<i class="fab fa-dollar-sign fa-responsive text-dark"></i>',
-            title: 'Currency Converter',
+            title: 'Currency calculator',
             onClick: function () {
-                $('#currencyModal').modal('show'); 
+                $('#currencyModal').modal('show');
             }
         }]
     }).addTo(map);
@@ -235,16 +240,14 @@ function initializeMap(accessToken) {
             icon: '<i class="fas fa-rss fa-responsive text-dark"></i>',
             title: 'Latest News',
             onClick: function () {
-                const countryCode = $('#countrySelect').val() || detectedCountryCode; 
-                const capitalCity = capitalName || 'news'; 
-                console.log("Country code being sent: ", countryCode);
-                console.log("Capital city being sent: ", capitalCity);
+                const countryCode = $('#countrySelect').val() || detectedCountryCode;
+                const capitalCity = capitalName || 'news';
                 $('#newsModal').modal('show');
                 fetchLatestNews(countryCode, capitalCity);
             }
         }]
     }).addTo(map);
-  
+
     const aboutBtn = L.easyButton({
         position: 'topleft',
         states: [{
@@ -257,19 +260,19 @@ function initializeMap(accessToken) {
         }]
     }).addTo(map);
 
-	infoBtn.button.style.backgroundColor = '#D2DE32';
-	wikiBtn.button.style.backgroundColor = '#D2DE32';
-	weatherBtn.button.style.backgroundColor = '#D2DE32';
-	currencyBtn.button.style.backgroundColor = '#D2DE32';
-	newsBtn.button.style.backgroundColor = '#D2DE32';
-  	aboutBtn.button.style.backgroundColor = '#D2DE32';
-  
+    infoBtn.button.style.backgroundColor = '#D2DE32';
+    wikiBtn.button.style.backgroundColor = '#D2DE32';
+    weatherBtn.button.style.backgroundColor = '#D2DE32';
+    currencyBtn.button.style.backgroundColor = '#D2DE32';
+    newsBtn.button.style.backgroundColor = '#D2DE32';
+    aboutBtn.button.style.backgroundColor = '#D2DE32';
 
     map.addLayer(airportsCG);
     map.addLayer(parksCG);
     map.addLayer(stadiumsCG);
     map.addLayer(museumsCG);
     map.addLayer(hotelsCG);
+
     loadCountryBorders();
     populateCountrySelect();
     detectUserCountry();
@@ -294,12 +297,12 @@ $.ajax({
 
 function loadCountryBorders() {
     $.ajax({
-        url: 'libs/php/getCountryBorders.php',
+        url: 'libs/php/getCountryFeature.php',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
             countryBorders = data;
-            console.log('Country borders loaded:', countryBorders); 
+            removePreloader(); 
         },
         error: function (xhr, status, error) {
             console.log('Error loading country borders:', error);
@@ -314,8 +317,9 @@ function detectUserCountry() {
             const lon = position.coords.longitude;
             detectedLat = lat;
             detectedLon = lon;
+
             $.ajax({
-                url: 'libs/php/getUserCountry.php',
+                url: 'libs/php/getCountryCode.php',
                 type: 'GET',
                 dataType: 'json',
                 data: {
@@ -323,17 +327,12 @@ function detectUserCountry() {
                     lon: lon
                 },
                 success: function (data) {
-                    detectedCountryCode = data.country_code.toUpperCase(); 
-                    detectedCountryName = data.country_name; 
-                    console.log('Detected country code:', detectedCountryCode);
-                    console.log('Detected country name:', detectedCountryName);
-                    displayCountryBorders(detectedCountryCode);
-                    fetchCountryInfo(detectedCountryCode, lat, lon); 
-                    fetchCountryAirports(detectedCountryCode);
-                    fetchCountryParks(detectedCountryCode);
-                    fetchCountryStadiums(detectedCountryCode);
-                    fetchCountryMuseums(detectedCountryCode);
-                    fetchCountryHotels(detectedCountryCode);
+                    if (data.status.code === 200) {
+                        const countryCode = data.countryCode;
+                        $('#countrySelect').val(countryCode).change();
+                    } else {
+                        console.error('Error fetching country code:', data.status.description);
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.log('Error detecting user country:', error);
@@ -347,99 +346,76 @@ function detectUserCountry() {
     }
 }
 
-function displayCountryBorders(countryCode) {
-    console.log("Display country borders for code:", countryCode);
-    if (!countryCode) {
-        console.error("Country code is undefined");
-        return;
-    }
-    if (!countryBorders) {
-        console.error("Country borders data not loaded");
-        return;
-    }
-    if (currentGeoJsonLayer) {
-        map.removeLayer(currentGeoJsonLayer);
-    }
-    const borderFeature = countryBorders.features.find(feature => feature.properties.iso_a2 === countryCode);
-    if (borderFeature) {
-        currentGeoJsonLayer = L.geoJSON(borderFeature, {
-            style: {
-                color: "#0E46A3",
-                weight: 4,
-                opacity: 0.65
-            }
-        }).addTo(map);
-        map.fitBounds(currentGeoJsonLayer.getBounds());
-    } else {
-        console.error("No borders found for country code:", countryCode);
-    }
+function updateCountryInfo(countryInfo) {
+    $('#countryName').html(countryInfo.name.common || 'N/A');
+    $('#capital').html(countryInfo.capital ? countryInfo.capital[0] : 'N/A');
+    $('#continent').html(countryInfo.region || 'N/A');
+    $('#population').html(numeral(countryInfo.population).format('0,0') || 'N/A');
+    $('#languages').html(countryInfo.languages ? Object.values(countryInfo.languages).join(', ') : 'N/A');
+    $('#area').html(numeral(countryInfo.area).format('0,0') + ' km²' || 'N/A');
+    $('#currency').html(countryInfo.currencies ? Object.keys(countryInfo.currencies).join(', ') : 'N/A');
 }
 
-function populateCountrySelect() {
-    $.ajax({
-        url: "libs/php/getCountries.php",
-        type: "GET",
-        dataType: 'json',
-        success: function (result) {
-            if (result.status.code != 200) {
-                console.log('Error reading geoJson file!');
-            } else {
-                result.data.forEach(data => {
-                    console.log('Adding country to select:', data); 
-                    $('#countrySelect').append(`<option value="${data.code}">${data.name}</option>`);
-                });
+function addCapitalMarker(capital, lat, lon) {
+    if (capitalMarker) {
+        map.removeLayer(capitalMarker);
+    }
 
-                $('#countrySelect').off('change').on('change', function () {
-                    const countryCode = $(this).val();
-                    const countryName = $('#countrySelect option:selected').text(); 
-                    console.log('Country selected from dropdown:', countryCode);
-                    displayCountryBorders(countryCode);
-                    fetchCountryInfo(countryCode, null, null, countryName); 
-                    fetchCountryAirports(countryCode);
-                    fetchCountryParks(countryCode);
-                    fetchCountryStadiums(countryCode);
-                    fetchCountryMuseums(countryCode);
-                    fetchCountryHotels(countryCode);
-                });
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log(xhr);
-            console.log('Error');
-            console.log(error);
-        }
+    const markerIcon = L.ExtraMarkers.icon({
+        icon: 'fa-solid fa-landmark-flag',
+        markerColor: 'red',
+        shape: 'square',
+        prefix: 'fa',
+        extraClasses: 'fa-2x'
+    });
+
+    capitalMarker = L.marker([lat, lon], {
+        icon: markerIcon
+    }).addTo(map)
+    .bindPopup(`<b>${capital}</b>`);
+
+    capitalMarker.on('click', function () {
+        fetchCapitalInfo(capital);
+        $('#capitalModal').modal('show');
     });
 }
 
-function fetchCountryInfo(countryCode, lat = null, lon = null, countryName = null) {
-    $.ajax({
-        url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
-        type: 'GET',
-        dataType: 'json',
-        success: function (result) {
-            console.log('REST Countries API Response:', result); 
-            if (result && result.length > 0) {
-                const countryInfo = result[0];
-                updateCountryInfo(countryInfo);
-                detectedCountryName = countryName || countryInfo.name.common;
-                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown'; 
-                console.log('Updated detected country name:', detectedCountryName); 
-                console.log('Capital city name:', capitalName); 
-                const capitalLat = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[0] : null;
-                const capitalLon = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[1] : null;
+$('#countrySelect').change(async function () {
+    const countryCode = $(this).val();
+    await removePreviousData(); 
+    fetchAndDisplayCountryBorders(countryCode);
+    fetchCountryInfo(countryCode);
+    fetchCountryAirports(countryCode);
+    fetchCountryParks(countryCode);
+    fetchCountryStadiums(countryCode);
+    fetchCountryMuseums(countryCode);
+    fetchCountryHotels(countryCode);
+});
 
-                if (capitalLat && capitalLon) {
-                    addCapitalMarker(capitalName, capitalLat, capitalLon);
-                } else {
-                    console.error('Invalid capital coordinates:', capitalLat, capitalLon);
-                }
-            } else {
-                console.error('No data found for country code:', countryCode);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log('Error fetching country info:', error);
+async function removePreviousData() {
+    await removeCapitalMarker(); 
+    removeAllMarkers(); 
+    if (currentGeoJsonLayer) {
+        map.removeLayer(currentGeoJsonLayer); 
+        currentGeoJsonLayer = null;
+    }
+}
+
+function removeAllMarkers() {
+    airportsCG.clearLayers();
+    parksCG.clearLayers();
+    stadiumsCG.clearLayers();
+    museumsCG.clearLayers();
+    hotelsCG.clearLayers();
+}
+
+function removeCapitalMarker() {
+    return new Promise((resolve) => {
+        if (capitalMarker) {
+            map.removeLayer(capitalMarker);
+            capitalMarker = null;
         }
+        resolve();
     });
 }
 
@@ -452,20 +428,22 @@ function fetchWikipediaSummary(title, countryCode) {
         url: `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.trim())}`,
         type: "GET",
         success: function (result) {
-            console.log('Wikipedia Response:', result); 
             if (result.extract) {
                 $('#wikiSummary').html(result.extract);
                 $('#wikiTitle').html(result.title);
                 fetchCountryFlag(countryCode);
+                $('.pre-load').addClass("fadeOut"); 
             } else {
                 $('#wikiSummary').html('No information available.');
                 $('#wikiTitle').html('No information available.');
+                $('.pre-load').addClass("fadeOut"); 
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.error('Wikipedia AJAX error: ' + textStatus + ' - ' + errorThrown);
             $('#wikiSummary').html('Failed to fetch Wikipedia information.');
             $('#wikiTitle').html('Failed to fetch Wikipedia information.');
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
 }
@@ -495,20 +473,22 @@ function fetchCapitalInfo(capital) {
         url: `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(capital)}`,
         type: "GET",
         success: function (result) {
-            console.log('Wikipedia Capital Response:', result); 
             if (result.extract) {
                 $('#capitalSummary').html(result.extract);
                 $('#capitalTitle').html(result.title);
                 fetchCapitalImage(capital);
+                $('.pre-load').addClass("fadeOut"); 
             } else {
                 $('#capitalSummary').html('No information available.');
                 $('#capitalTitle').html('No information available.');
+                $('.pre-load').addClass("fadeOut"); 
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.error('Wikipedia AJAX error: ' + textStatus + ' - ' + errorThrown);
             $('#capitalSummary').html('Failed to fetch Wikipedia information.');
             $('#capitalTitle').html('Failed to fetch Wikipedia information.');
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
 }
@@ -516,6 +496,7 @@ function fetchCapitalInfo(capital) {
 function fetchCapitalImage(capital) {
     const query = encodeURIComponent(capital);
     const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${query}`;
+    
     $.ajax({
         url: url,
         type: "GET",
@@ -533,180 +514,117 @@ function fetchCapitalImage(capital) {
     });
 }
 
-function updateCountryInfo(countryInfo) {
-    $('#countryName').html(countryInfo.name.common || 'N/A');
-    $('#capital').html(countryInfo.capital ? countryInfo.capital[0] : 'N/A');
-    $('#continent').html(countryInfo.region || 'N/A');
-    $('#population').html(numeral(countryInfo.population).format('0,0') || 'N/A');
-    $('#languages').html(countryInfo.languages ? Object.values(countryInfo.languages).join(', ') : 'N/A');
-    $('#area').html(numeral(countryInfo.area).format('0,0') + ' km²' || 'N/A');
-    $('#currency').html(countryInfo.currencies ? Object.keys(countryInfo.currencies).join(', ') : 'N/A');
-}
+$('#weatherModal').on('show.bs.modal', function (e) {
+    $('.pre-load').removeClass("fadeOut"); 
 
-function displayError(message) {
-    $('#modalInfo .modal-body').html(`
-        <div class="alert alert-danger">${message}</div>
-    `);
-}
+    const countryCode = $('#countrySelect').val() || detectedCountryCode;
 
-function addCapitalMarker(capital, lat, lon) {
-    if (capitalMarker) {
-        map.removeLayer(capitalMarker);
-    }
-    const markerIcon = L.ExtraMarkers.icon({
-        icon: 'fa-solid fa-landmark-flag',
-        markerColor: 'red',
-        shape: 'square',
-        prefix: 'fa',
-        extraClasses: 'fa-2x'
-    });
-    capitalMarker = L.marker([lat, lon], {
-        icon: markerIcon
-    }).addTo(map).bindPopup(`<b>${capital}</b>`);
-    capitalMarker.on('click', function () {
-        fetchCapitalInfo(capital);
-        $('#capitalModal').modal('show');
-    });
-}
-
-function showCountryInfo(countryCode) {
     $.ajax({
         url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
         type: 'GET',
         dataType: 'json',
         success: function (result) {
-            console.log('REST Countries API Response:', result);
-            if (result && result.length > 0) {
+            if (result && result[0]) {
                 const countryInfo = result[0];
-                updateCountryInfo(countryInfo);
+                const capitalLat = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[0] : null;
+                const capitalLon = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[1] : null;
+                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown';
+                const countryName = countryInfo.name.common;
+
+                if (capitalLat && capitalLon) {
+                    fetchWeatherData(capitalLat, capitalLon, capitalName, countryName);
+                } else {
+                    $('#weatherModalLabel').text("Error retrieving data");
+                    $('.pre-load').addClass("fadeOut"); 
+                }
             } else {
-                console.error('No data found for country code:', countryCode);
+                $('#weatherModalLabel').text("Error retrieving data");
+                $('.pre-load').addClass("fadeOut"); 
             }
         },
         error: function (xhr, status, error) {
-            console.log('Error fetching country info:', error);
+            $('#weatherModalLabel').text("Error retrieving data");
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
-}
+});
 
-function fetchWeatherData(lat, lon, countryCode) {
+function fetchWeatherData(lat, lon, capitalName, countryName) {
     $.ajax({
         url: 'libs/php/getWeather.php',
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         data: {
             lat: lat,
             lon: lon
         },
-        success: function (data) {
-            console.log('Weather data:', data);
-            updateWeatherInfo(data, countryCode);
-        },
-        error: function (xhr, status, error) {
-            console.log('Error fetching weather data:', error);
-        }
-    });
-}
-
-function updateWeatherInfo(data, countryCode) {
-    console.log('Update weather info:', data);
-    if (!data || !data.weather || !data.main) {
-        $('#currentWeather').html('<p>No weather data available.</p>');
-        return;
-    }
-
-    const currentTemp = Math.round(data.main.temp);
-    const feelsLikeTemp = Math.round(data.main.feels_like);
-    const weatherCondition = data.weather[0].description;
-    const weatherIcon = getWeatherIcon(data.weather[0].icon);
-    const date = new Date();
-    const options = {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    };
-    const currentDate = date.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
-
-    $('#cityName').text(`${capitalName}, ${countryCode}`);
-    $('#currentDay').text(currentDate);
-    $('#currentTemp').text(`${currentTemp}°C`);
-    $('#feelsLikeTemp').text(`Feels like: ${feelsLikeTemp}°C`);
-    $('#currentConditions').html(`<i class="${weatherIcon}"></i> ${weatherCondition}`);
-}
-
-function getWeatherIcon(icon) {
-    const iconMap = {
-        '01d': 'fas fa-sun',
-        '01n': 'fas fa-moon',
-        '02d': 'fas fa-cloud-sun',
-        '02n': 'fas fa-cloud-moon',
-        '03d': 'fas fa-cloud',
-        '03n': 'fas fa-cloud',
-        '04d': 'fas fa-cloud-meatball',
-        '04n': 'fas fa-cloud-meatball',
-        '09d': 'fas fa-cloud-showers-heavy',
-        '09n': 'fas fa-cloud-showers-heavy',
-        '10d': 'fas fa-cloud-sun-rain',
-        '10n': 'fas fa-cloud-moon-rain',
-        '11d': 'fas fa-bolt',
-        '11n': 'fas fa-bolt',
-        '13d': 'fas fa-snowflake',
-        '13n': 'fas fa-snowflake',
-        '50d': 'fas fa-smog',
-        '50n': 'fas fa-smog'
-    };
-    return iconMap[icon] || 'fas fa-question';
-}
-
-$('#weatherBtn').click(function () {
-    const countryCode = $('#countrySelect').val() || detectedCountryCode;
-    if (countryCode === detectedCountryCode) {
-        fetchWeatherData(detectedLat, detectedLon, detectedCountryCode);
-    } else {
-        $.ajax({
-            url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
-            type: 'GET',
-            dataType: 'json',
-            success: function (result) {
-                if (result && result.length > 0) {
-                    const countryInfo = result[0];
-                    const lat = countryInfo.latlng[0];
-                    const lon = countryInfo.latlng[1];
-                    capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown'; 
-                    fetchWeatherData(lat, lon, countryCode);
-                } else {
-                    console.error('No data found for country code:', countryCode);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching country info:', error);
-            }
-        });
-    }
-    $('#modalWeather').modal('show');
-});
-
-$('#countrySelect').change(function () {
-    const countryCode = $(this).val();
-    $.ajax({
-        url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
-        type: 'GET',
-        dataType: 'json',
         success: function (result) {
-            if (result && result.length > 0) {
-                const countryInfo = result[0];
-                const lat = countryInfo.latlng[0];
-                const lon = countryInfo.latlng[1];
-                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown'; 
-                fetchWeatherData(lat, lon, countryCode);
+            const resultCode = result.status.code;
+
+            if (resultCode === 200) {
+                const d = result.data;
+
+                $('#weatherModalLabel').html(`${capitalName}, ${countryName}`);
+
+                $('#todayConditions').html(d.forecast[0].conditionText);
+                $('#todayIcon').attr("src", `https://openweathermap.org/img/wn/${d.forecast[0].conditionIcon}@2x.png`);
+                $('#todayMaxTemp').html(numeral(d.forecast[0].maxC).format('0'));
+                $('#todayMinTemp').html(numeral(d.forecast[0].minC).format('0'));
+
+                $('#day1Date').text(Date.parse(d.forecast[1].date).toString("ddd dS"));
+                $('#day1Icon').attr("src", `https://openweathermap.org/img/wn/${d.forecast[1].conditionIcon}@2x.png`);
+                $('#day1MinTemp').text(numeral(d.forecast[1].minC).format('0'));
+                $('#day1MaxTemp').text(numeral(d.forecast[1].maxC).format('0'));
+
+                $('#day2Date').text(Date.parse(d.forecast[2].date).toString("ddd dS"));
+                $('#day2Icon').attr("src", `https://openweathermap.org/img/wn/${d.forecast[2].conditionIcon}@2x.png`);
+                $('#day2MinTemp').text(numeral(d.forecast[2].minC).format('0'));
+                $('#day2MaxTemp').text(numeral(d.forecast[2].maxC).format('0'));
+
+                $('#day3Date').text(Date.parse(d.forecast[3].date).toString("ddd dS"));
+                $('#day3Icon').attr("src", `https://openweathermap.org/img/wn/${d.forecast[3].conditionIcon}@2x.png`);
+                $('#day3MinTemp').text(numeral(d.forecast[3].minC).format('0'));
+                $('#day3MaxTemp').text(numeral(d.forecast[3].maxC).format('0'));
+
+                $('#lastUpdated').text(Date.parse(d.lastUpdated).toString("HH:mm, dS MMM"));
+
+                $('.pre-load').addClass("fadeOut"); 
             } else {
-                console.error('No data found for country code:', countryCode);
+                $('#weatherModalLabel').text("Error retrieving data");
+                $('.pre-load').addClass("fadeOut"); 
             }
         },
-        error: function (xhr, status, error) {
-            console.log('Error fetching country info:', error);
+        error: function (jqXHR, textStatus, errorThrown) {
+            $('#weatherModalLabel').text("Error retrieving data");
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
+}
+
+$('#weatherModal').on('hidden.bs.modal', function (e) {
+    $('.pre-load').removeClass("fadeOut"); 
+
+    $('#todayConditions').html("");
+    $('#todayIcon').attr("src", "");
+    $('#todayMaxTemp').html("");
+    $('#todayMinTemp').html("");
+
+    $('#day1Date').text("");
+    $('#day1Icon').attr("src", "");
+    $('#day1MinTemp').text("");
+    $('#day1MaxTemp').text("");
+
+    $('#day2Date').text("");
+    $('#day2Icon').attr("src", "");
+    $('#day2MinTemp').text("");
+    $('#day2MaxTemp').text("");
+
+    $('#day3Date').text("");
+    $('#day3Icon').attr("src", "");
+    $('#day3MinTemp').text("");
+    $('#day3MaxTemp').text("");
+
+    $('#lastUpdated').text("");
 });
 
 function fetchCountryAirports(countryCode) {
@@ -719,7 +637,6 @@ function fetchCountryAirports(countryCode) {
             countryCode: countryCode
         },
         success: function (result) {
-            console.log('API Response:', result); 
             if (result && result.length > 0) {
                 const airports = result;
                 airports.forEach(airport => {
@@ -729,12 +646,13 @@ function fetchCountryAirports(countryCode) {
                         .bindPopup(`<strong>${airport.name}</strong>`);
                     airportsCG.addLayer(airportMarker);
                 });
+                removePreloader(); 
             } else {
-                console.error('No airport data found in the response.');
+                showToast("No airport information is available for this region", 4000, false);
             }
         },
-        error: function (xhr, status, errorThrown) {
-            console.error('Error fetching airports:', status, errorThrown);
+        error: function (jqXHR, textStatus, errorThrown) {
+            showToast("Airports - server error", 4000, false);
         }
     });
 }
@@ -749,7 +667,6 @@ function fetchCountryParks(countryCode) {
             countryCode: countryCode
         },
         success: function (result) {
-            console.log('API Response:', result); 
             if (result && result.length > 0) {
                 const parks = result;
                 parks.forEach(park => {
@@ -759,12 +676,13 @@ function fetchCountryParks(countryCode) {
                         .bindPopup(`<strong>${park.name}</strong>`);
                     parksCG.addLayer(parkMarker);
                 });
+                removePreloader(); 
             } else {
-                console.error('No park data found in the response.');
+                showToast("No park information is available for this region", 4000, false);
             }
         },
         error: function (xhr, status, errorThrown) {
-            console.error('Error fetching parks:', status, errorThrown);
+            showToast("Parks - server error", 4000, false);
         }
     });
 }
@@ -779,7 +697,6 @@ function fetchCountryStadiums(countryCode) {
             countryCode: countryCode
         },
         success: function (result) {
-            console.log('API Response:', result); 
             if (result && result.length > 0) {
                 const stadiums = result;
                 stadiums.forEach(stadium => {
@@ -787,80 +704,80 @@ function fetchCountryStadiums(countryCode) {
                             icon: stadiumIcon
                         })
                         .bindPopup(`<strong>${stadium.name}</strong>`);
-                        stadiumsCG.addLayer(stadiumMarker);
-                    });
-                } else {
-                    console.error('No stadium data found in the response.');
-                }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.error('Error fetching stadiums:', status, errorThrown);
+                    stadiumsCG.addLayer(stadiumMarker);
+                });
+                removePreloader(); 
+            } else {
+                showToast("No stadium information is available for this region", 4000, false);
             }
-        });
-    }
-    
-    function fetchCountryMuseums(countryCode) {
-        museumsCG.clearLayers();
-        $.ajax({
-            url: "libs/php/getMuseums.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                countryCode: countryCode
-            },
-            success: function (result) {
-                console.log('API Response:', result); 
-                if (result && result.length > 0) {
-                    const museums = result;
-                    museums.forEach(museum => {
-                        const museumMarker = L.marker([museum.lat, museum.lng], {
-                                icon: museumIcon
-                            })
-                            .bindPopup(`<strong>${museum.name}</strong>`);
-                        museumsCG.addLayer(museumMarker);
-                    });
-                } else {
-                    console.error('No museum data found in the response.');
-                }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.error('Error fetching museums:', status, errorThrown);
+        },
+        error: function (xhr, status, errorThrown) {
+            showToast("Stadiums - server error", 4000, false);
+        }
+    });
+}
+
+function fetchCountryMuseums(countryCode) {
+    museumsCG.clearLayers();
+    $.ajax({
+        url: "libs/php/getMuseums.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            countryCode: countryCode
+        },
+        success: function (result) {
+            if (result && result.length > 0) {
+                const museums = result;
+                museums.forEach(museum => {
+                    const museumMarker = L.marker([museum.lat, museum.lng], {
+                            icon: museumIcon
+                        })
+                        .bindPopup(`<strong>${museum.name}</strong>`);
+                    museumsCG.addLayer(museumMarker);
+                });
+                removePreloader(); 
+            } else {
+                showToast("No museum information is available for this region", 4000, false);
             }
-        });
-    }
-    
-    function fetchCountryHotels(countryCode) {
-        hotelsCG.clearLayers();
-        $.ajax({
-            url: "libs/php/getHotels.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                countryCode: countryCode
-            },
-            success: function (result) {
-                console.log('API Response:', result);
-                if (result && result.length > 0) {
-                    const hotels = result;
-                    hotels.forEach(hotel => {
-                        const hotelMarker = L.marker([hotel.lat, hotel.lng], {
-                                icon: hotelIcon
-                            })
-                            .bindPopup(`<strong>${hotel.name}</strong>`);
-                        hotelsCG.addLayer(hotelMarker);
-                    });
-                } else {
-                    console.error('No hotel data found in the response.');
-                }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.error('Error fetching hotels:', status, errorThrown);
+        },
+        error: function (xhr, status, errorThrown) {
+            showToast("Museums - server error", 4000, false);
+        }
+    });
+}
+
+function fetchCountryHotels(countryCode) {
+    hotelsCG.clearLayers();
+    $.ajax({
+        url: "libs/php/getHotels.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            countryCode: countryCode
+        },
+        success: function (result) {
+            if (result && result.length > 0) {
+                const hotels = result;
+                hotels.forEach(hotel => {
+                    const hotelMarker = L.marker([hotel.lat, hotel.lng], {
+                            icon: hotelIcon
+                        })
+                        .bindPopup(`<strong>${hotel.name}</strong>`);
+                    hotelsCG.addLayer(hotelMarker);
+                });
+                removePreloader(); 
+            } else {
+                showToast("No hotel information is available for this region", 4000, false);
             }
-        });
-    }
-    
-function fetchLatestNews(countryCode) {
-    console.log("Fetching news for country code:", countryCode); 
+        },
+        error: function (xhr, status, errorThrown) {
+            showToast("Hotels - server error", 4000, false);
+        }
+    });
+}
+
+function fetchLatestNews(countryCode, capitalCity) {
     $.ajax({
         url: 'libs/php/getNews.php',
         type: 'GET',
@@ -871,13 +788,14 @@ function fetchLatestNews(countryCode) {
         success: function (data) {
             if (data.error) {
                 console.error('Error fetching news:', data.error, data.details);
-                $('#newsContent').html('<p class="text-danger">Error fetching news: ' + data.error + '</p>');
+                $('#newsContent').html('<p class="text-danger">No latest news are available for this region now.</p>');
+                $('.pre-load').addClass("fadeOut"); 
             } else {
-                console.log('News data:', data); 
                 if (data.news && data.news.length > 0) {
                     displayNews(data.news);
                 } else {
                     $('#newsContent').html('<p>No news articles found.</p>');
+                    $('.pre-load').addClass("fadeOut"); 
                 }
             }
         },
@@ -890,104 +808,136 @@ function fetchLatestNews(countryCode) {
             }
             console.error('Error fetching news:', error);
             $('#newsContent').html('<p class="text-danger">' + errorMessage + '</p>');
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
 }
 
 function displayNews(articles) {
     const newsContent = $('#newsContent');
-    newsContent.empty(); 
+    newsContent.empty();
 
     if (articles.length === 0) {
         newsContent.append('<p>No news articles found.</p>');
         return;
     }
 
-    let articlesAdded = 0; 
+    articles.sort((a, b) => new Date(b.published) - new Date(a.published));
 
     articles.forEach(article => {
-        if (articlesAdded < 5 && article.image && article.image.trim() !== '') {
-            const articleHtml = `
-                <div class="card mb-3">
-                    <img src="${article.image}" class="card-img-top" alt="${article.title}" style="width: 100%; height: auto;">
-                    <div class="card-body">
-                        <h5 class="card-title">${article.title}</h5>
-                        <p class="card-text">${article.description || ''}</p>
-                        <p class="card-text"><small class="text-muted">Published at: ${new Date(article.published).toLocaleString()}</small></p>
-                        <a href="${article.url}" class="btn btn-primary" target="_blank">Read more</a>
-                    </div>
+        const articleImage = article.image && article.image !== "None" ? `<img src="${article.image}" class="card-img-top" alt="${article.title}" style="width: 100%; height: auto;">` : '';
+        const timeAgo = timeDifference(new Date(), new Date(article.published));
+
+        const articleHtml = `
+            <div class="card mb-3">
+                ${articleImage}
+                <div class="card-body">
+                    <h5 class="card-title">${article.title}</h5>
+                    <p class="card-text">${article.description || ''}</p>
+                    <p class="card-text"><small class="text-muted">Published: ${timeAgo}</small></p>
                 </div>
-            `;
-            newsContent.append(articleHtml);
-            articlesAdded++;
-        }
+            </div>
+        `;
+        newsContent.append(articleHtml);
     });
 
-    if (articlesAdded === 0) {
-        newsContent.append('<p>No news articles found with valid images.</p>');
+    $('.pre-load').addClass("fadeOut"); 
+}
+
+function timeDifference(current, previous) {
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerMonth = msPerDay * 30;
+    const msPerYear = msPerDay * 365;
+
+    const elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+        return Math.round(elapsed/1000) + ' seconds ago';   
+    } else if (elapsed < msPerHour) {
+        return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    } else if (elapsed < msPerDay) {
+        return Math.round(elapsed/msPerHour) + ' hours ago';   
+    } else if (elapsed < msPerMonth) {
+        return Math.round(elapsed/msPerDay) + ' days ago';   
+    } else if (elapsed < msPerYear) {
+        return Math.round(elapsed/msPerMonth) + ' months ago';   
+    } else {
+        return Math.round(elapsed/msPerYear) + ' years ago';   
     }
 }
 
-    $('#currencyModal').on('show.bs.modal', function () {
-    resetCurrencyForm();
-    const countryCode = detectedCountryCode || $('#countrySelect').val();
-    fetchCurrencies(countryCode);
-});
-
-$('#currency-form').on('submit', function (e) {
-    e.preventDefault();
-    convertCurrency();
-});
-
-$('#fromAmount').on('keyup', function () {
-    const from = "USD";
-    const to = $("#exchangeRate").val();
-    const amount = $("#fromAmount").val();
-    calResult(from, to, amount);
-});
-
-$('#fromAmount').on('change', function () {
-    const from = "USD";
-    const to = $("#exchangeRate").val();
-    const amount = $("#fromAmount").val();
-    calResult(from, to, amount);
-});
-
-$("#exchangeRate").change(function () {
-    const from = "USD";
-    const to = $("#exchangeRate").val();
-    calResult(from, to);
-});
-
-function resetCurrencyForm() {
-    $('#fromAmount').val(1);
-    $('#exchangeRate').val($('#exchangeRate option:first').val());
-    $('#toAmount').val('');
-}
-
-function fetchCurrencies(countryCode) {
+function populateCountrySelect() {
     $.ajax({
-        url: 'libs/php/getCurrencies.php?currencies=true',
-        type: 'GET',
+        url: "libs/php/getCountries.php",
+        type: "GET",
         dataType: 'json',
-        success: function (data) {
-            console.log('Fetched data:', data);
-            if (data.error) {
-                showToast(data.error, 4000, true, "#ffffff");
+        success: function (result) {
+            if (result.status.code != 200) {
+                console.log('Error reading geoJson file!');
             } else {
-                fetchCountryCurrency(countryCode, function (currencyCode) {
-                    populateCurrencySelect(data, currencyCode);
+                result.data.forEach(data => {
+                    $('#countrySelect').append(`<option value="${data.code}">${data.name}</option>`);
+                });
+
+                $('#countrySelect').off('change').on('change', function () {
+                    const countryCode = $(this).val();
+                    const countryName = $('#countrySelect option:selected').text();
+                    displayCountryBorders(countryCode);
+                    fetchCountryInfo(countryCode, null, null, countryName);
+                    fetchCountryAirports(countryCode);
+                    fetchCountryParks(countryCode);
+                    fetchCountryStadiums(countryCode);
+                    fetchCountryMuseums(countryCode);
+                    fetchCountryHotels(countryCode);
                 });
             }
         },
         error: function (xhr, status, error) {
-            showToast('Error fetching currencies', 4000, true, "#ffffff");
-            console.log('Error details:', error);
+            console.log(xhr);
+            console.log('Error');
+            console.log(error);
         }
     });
 }
 
-function fetchCountryCurrency(countryCode, callback) {
+function displayCountryBorders(countryCode) {
+    $.ajax({
+        url: 'libs/php/getCountryFeature.php',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            countryCode: countryCode
+        },
+        success: function (response) {
+            if (response.status.code === 200) {
+                const countryFeature = response.data;
+
+                if (currentGeoJsonLayer) {
+                    map.removeLayer(currentGeoJsonLayer);
+                }
+
+                currentGeoJsonLayer = L.geoJSON(countryFeature, {
+                    style: {
+                        color: "#0E46A3",
+                        weight: 4,
+                        opacity: 0.65
+                    }
+                }).addTo(map);
+                map.fitBounds(currentGeoJsonLayer.getBounds());
+                removeAllMarkers();
+            } else {
+                console.error('Error:', response.status.description);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+        }
+    });
+}
+
+function fetchCountryInfo(countryCode, lat = null, lon = null, countryName = null, retries = 3) {
     $.ajax({
         url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
         type: 'GET',
@@ -995,63 +945,212 @@ function fetchCountryCurrency(countryCode, callback) {
         success: function (result) {
             if (result && result.length > 0) {
                 const countryInfo = result[0];
-                const currencyCode = Object.keys(countryInfo.currencies)[0];
-                callback(currencyCode);
+                updateCountryInfo(countryInfo);
+                detectedCountryName = countryName || countryInfo.name.common;
+                capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown';
+
+                const capitalLat = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[0] : null;
+                const capitalLon = countryInfo.capitalInfo ? countryInfo.capitalInfo.latlng[1] : null;
+
+                if (capitalLat && capitalLon) {
+                    addCapitalMarker(capitalName, capitalLat, capitalLon);
+                } else {
+                    console.error('Invalid capital coordinates:', capitalLat, capitalLon);
+                }
             } else {
-                callback(null);
+                console.error('No data found for country code:', countryCode);
             }
+            $('.pre-load').addClass("fadeOut"); 
         },
         error: function (xhr, status, error) {
-            console.log('Error fetching country currency:', error);
-            callback(null);
+            if (retries > 0) {
+                console.warn(`Retrying... (${3 - retries} retries left)`);
+                setTimeout(() => fetchCountryInfo(countryCode, lat, lon, countryName, retries - 1), 2000);
+            } else {
+                console.log('Error fetching country info:', error);
+            }
+            $('.pre-load').addClass("fadeOut"); 
         }
     });
 }
 
-function populateCurrencySelect(currencies, countryCurrencyCode) {
-    const select = $('#exchangeRate');
-    select.empty();
+function showCountryInfo(countryCode) {
+    fetchCountryInfo(countryCode);
+}
 
-    $.each(currencies, function(code, name) {
-        console.log('Adding option:', code, name);
-        select.append($('<option>', { value: code, text: `${name} (${code})` }));
+$(document).ready(function() {
+    $('#currencyModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+        resetCurrencyForm();
+        fetchCurrencies();
     });
 
-    if (countryCurrencyCode) {
-        select.val(countryCurrencyCode);
-    } else {
-        select.val(select.find('option:first').val());
+    $('#currency-form').on('submit', function(e) {
+        e.preventDefault();
+        convertCurrency();
+    });
+
+    $('#fromAmount').on('keyup', function () {
+        calcResult();
+    });
+
+    $('#fromAmount').on('change', function () {
+        calcResult();
+    });
+
+    $('#exchangeRate').on('change', function () {
+        calcResult();
+    });
+
+    function resetCurrencyForm() {
+        $('#fromAmount').val(1);
+        $('#exchangeRate').val($('#exchangeRate option:first').val());
+        $('#toAmount').val('');
     }
 
-    const from = "USD";
-    const to = select.val();
-    calResult(from, to);
-}
-
-function calResult(from, to, amount = 1) {
-    $.ajax({
-        url: 'libs/php/getExchangeRate.php',
-        type: 'POST',
-        dataType: 'json',
-        data: { from: from, to: to, amount: amount },
-        success: function (result) {
-            if (result && result.convertedAmount) {
-                const convertedRate = numeral(result.convertedAmount).format("0,0.00");
-                $("#toAmount").val(convertedRate);
-            } else {
-                showToast('Error retrieving currency data', 4000, true, "#ffffff");
+    function fetchCurrencies() {
+        $.ajax({
+            url: 'libs/php/getCurrencies.php?currencies=true',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log('Fetched data:', data); 
+                if (data.error) {
+                    showToast(data.error, 4000, true, "#ffffff");
+                } else {
+                    populateCurrencySelect(data);
+                }
+                $('.pre-load').addClass("fadeOut"); 
+            },
+            error: function (xhr, status, error) {
+                showToast('Error fetching currencies', 4000, true, "#ffffff");
+                console.log('Error details:', error); 
+                $('.pre-load').addClass("fadeOut"); 
             }
-        },
-        error: function (jqXHR, status, errorThrown) {
-            showToast('Error retrieving currency data', 4000, true, "#ffffff");
-        }
-    });
-}
+        });
+    }
 
-function convertCurrency() {
-    const from = "USD";
-    const to = $("#exchangeRate").val();
-    const amount = $("#fromAmount").val();
-    calResult(from, to, amount);
-    showToast("Conversion successful!", 4000, true, "#ffffff");
+    function populateCurrencySelect(currencies) {
+        const select = $('#exchangeRate');
+        select.empty();
+
+        const currencyArray = Object.entries(currencies);
+
+        currencyArray.forEach(([code, name]) => {
+            console.log('Adding option:', code, name); 
+            select.append($('<option>', { value: code, text: `${name} (${code})` }));
+        });
+
+        const currencyCountryCode = detectedCountryCode || $('#countrySelect').val();
+        setCurrencyForCountry(currencyCountryCode);
+    }
+
+    function setCurrencyForCountry(countryCode) {
+        $.ajax({
+            url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                if (result && result.length > 0) {
+                    const countryInfo = result[0];
+                    const currencyCode = Object.keys(countryInfo.currencies)[0];
+                    $('#exchangeRate').val(currencyCode).change();
+                } else {
+                    console.error('No data found for country code:', countryCode);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error fetching country info:', error);
+            }
+        });
+    }
+
+    function calcResult() {
+        const fromAmount = parseFloat($('#fromAmount').val());
+        const exchangeRateCode = $('#exchangeRate').val();
+
+        console.log('From Amount:', fromAmount);
+        console.log('Selected Exchange Rate Code:', exchangeRateCode);
+
+        if (isNaN(fromAmount) || !exchangeRateCode || fromAmount <= 0) {
+            $('#toAmount').val('');
+            showToast("Invalid input. Please enter a valid amount.", 4000, true, "#ffffff");
+            return;
+        }
+
+        fetchExchangeRate(exchangeRateCode, function(exchangeRate) {
+            const result = fromAmount * exchangeRate;
+            console.log('Result:', result);
+            $('#toAmount').val(numeral(result).format("0,0.00"));
+            $('.pre-load').addClass("fadeOut"); 
+        });
+    }
+
+    function fetchExchangeRate(code, callback) {
+        $.ajax({
+            url: 'libs/php/getExchangeRates.php',
+            type: 'POST',
+            data: { code: code },
+            dataType: 'json',
+            success: function(data) {
+                console.log('Fetched exchange rate data:', data); 
+                if (data && data.rate) {
+                    callback(data.rate);
+                } else {
+                    showToast('Error fetching exchange rate', 4000, true, "#ffffff");
+                }
+                $('.pre-load').addClass("fadeOut"); 
+            },
+            error: function(xhr, status, error) {
+                showToast('Error fetching exchange rate', 4000, true, "#ffffff");
+                console.log('Error details:', error); 
+                $('.pre-load').addClass("fadeOut"); 
+            }
+        });
+    }
+
+    function convertCurrency() {
+        const fromAmount = parseFloat($('#fromAmount').val());
+        const exchangeRateCode = $('#exchangeRate').val();
+
+        console.log('From Amount:', fromAmount);
+        console.log('Selected Exchange Rate Code:', exchangeRateCode);
+
+        if (isNaN(fromAmount) || !exchangeRateCode || fromAmount <= 0) {
+            showToast("Invalid input. Please enter a valid amount.", 4000, true, "#ffffff");
+            return;
+        }
+
+        fetchExchangeRate(exchangeRateCode, function(exchangeRate) {
+            const toAmount = fromAmount * exchangeRate;
+            console.log('To Amount:', toAmount);
+            $('#toAmount').val(toAmount.toFixed(2));
+            showToast("Conversion successful!", 4000, true, "#ffffff");
+            $('.pre-load').addClass("fadeOut"); 
+        });
+    }
+    
+    $('#modalInfo').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+    });
+
+    $('#wikiModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+    });
+
+    $('#capitalModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+    });
+
+    $('#newsModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+    });
+});
+
+function removePreloader() {
+    if ($('#preloader').length) {
+        $('#preloader').fadeOut('slow', function () {
+            $(this).remove();
+        });
+    }
 }
