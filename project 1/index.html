@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gazetteer</title>
 	
-    <link rel="apple-touch-icon" sizes="180x180" href="vendors/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="vendors/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="vendors/favicon/favicon-16x16.png">
-    <link rel="manifest" href="vendors/favicon/site.webmanifest">
+  	<link rel="apple-touch-icon" sizes="180x180" href="vendors/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="vendors/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="vendors/favicon/favicon-16x16.png">
+	<link rel="manifest" href="vendors/favicon/site.webmanifest">
 
     <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css">
 
@@ -18,25 +18,25 @@
 
     <link rel="stylesheet" href="vendors/LeafletEasyButton/src/easy-button.css">
   
-    <link rel="stylesheet" href="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.css">
+  	<link rel="stylesheet" href="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.css">
   
-    <link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.css">
+  	<link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.css">
   
-    <link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.Default.css">
-
-    <link rel="stylesheet" href="vendors/toastify/toastify.css">
+  	<link rel="stylesheet" href="vendors/Leaflet.markercluster/MarkerCluster.Default.css">
+  	
+  	<link rel="stylesheet" href="vendors/toastify/toastify.css">
 
     <link rel="stylesheet" href="libs/css/style.css">
   
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
    
 </head>
 <body>
-
-	<div id=”preloader”></div>
-	
+  
+      <div id=”preloader”></div>
+  
     <span id="selectContainer">
         <select id="countrySelect" class="form-select shadow-sm">
           <option value="">Select country...</option>
@@ -53,6 +53,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              <div class="pre-load"></div>
                 <table class="table table-striped">
                     <tr>
                         <td class="text-center">
@@ -117,6 +118,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body bg-warning">
+              <div class="pre-load"></div>
                 <img id="countryFlag" src="" alt="Country Flag" class="img-fluid mb-3 border border-white rounded" style="display: block; margin-left: auto; margin-right: auto;">
                 <p id="wikiSummary" class="text-justify">Loading...</p>
             </div>
@@ -124,28 +126,92 @@
     </div>
 </div>
  
-<div class="modal fade" id="modalWeather" tabindex="-1" aria-labelledby="modalWeatherLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-info text-center">
-      <div class="modal-header border-0 bg-info text-white">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-white">
-        <div id="weatherInfo">
-          <div id="currentWeather">
-            <h3 id="cityName"></h3>
-            <p id="currentDay"></p>
-            <h2 id="currentTemp"></h2>
-            <p id="feelsLikeTemp"></p>
-            <p id="currentConditions"></p>
-          </div>
+<div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="weatherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">      
+            <div class="modal-header bg-primary bg-gradient text-white">
+                <h5 class="modal-title" id="weatherModalLabel"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="pre-load"></div>
+                <div class="row">
+                    <div class="col border m-2">
+                        <p class="fw-bold fs-5 mt-1">TODAY</p>
+                        <div class="row">
+                            <div class="col text-center m-3">
+                                <p id="todayConditions" class="fw-bold fs-6"></p>
+                            </div>
+                            <div class="col text-center">
+                                <img id="todayIcon" class="img-fluid mt-0" src="" alt="" title="">
+                            </div>              
+                            <div class="col text-center">
+                                <p class="fw-bold fs-4 mb-0"><span id="todayMaxTemp">3</span><sup>o</sup><span class="tempMetric">c</span></p>
+                                <p class="fs-5 mt-0 text-secondary"><span id="todayMinTemp">-2</span><sup>o</sup><span class="tempMetric">c</span></p>
+                            </div>              
+                        </div>
+                    </div>   
+                </div>
+                <div class="row">
+                    <div class="col border m-2">
+                        <div class="row">
+                            <div class="col text-center">
+                                <p id="day1Date" class="fw-bold fs-6 mt-3"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col text-center">
+                                <p class="fw-bold fs-4 mb-0"><span id="day1MaxTemp"></span><sup>o</sup>c</p>
+                                <p class="fs-5 mt-0 text-secondary"><span id="day1MinTemp"></span><sup>o</sup>c</p>
+                            </div>
+                            <div class="col text-center">
+                                <img id="day1Icon" src="" alt="" title="">
+                            </div>    
+                        </div>
+                    </div>   
+                    <div class="col border m-2">
+                        <div class="row">
+                            <div class="col text-center">
+                                <p id="day2Date" class="fw-bold fs-6 mt-3">Fri 16th</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col text-center">
+                                <p class="fw-bold fs-4 mb-0"><span id="day2MaxTemp"></span><sup>o</sup>c</p>
+                                <p class="fs-5 mt-0 text-secondary"><span id="day2MinTemp"></span><sup>o</sup>c</p>
+                            </div>
+                            <div class="col text-center">
+                                <img id="day2Icon" src="" alt="" title="">
+                            </div>    
+                        </div>
+                    </div>         
+                    <div class="col border m-2">
+                        <div class="row">
+                            <div class="col text-center">
+                                <p id="day3Date" class="fw-bold fs-6 mt-3"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col text-center">
+                                <p class="fw-bold fs-4 mb-0"><span id="day3MaxTemp"></span><sup>o</sup>c</p>
+                                <p class="fs-5 mt-0 text-secondary"><span id="day3MinTemp"></span><sup>o</sup>c</p>
+                            </div>
+                            <div class="col text-center">
+                                <img id="day3Icon" src="" alt="" title="">
+                            </div>    
+                        </div>
+                    </div>       
+                </div>   
+            </div>
+            <div class="modal-footer text-center w-100">
+                <p class="fs-6 fw-light">Last updated <span id="lastUpdated"></span>. Powered by <a href="https://openweathermap.org/" target="_blank" title="OpenWeather API">OpenWeather</a></p>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
-  
-<div class="modal fade" id="currencyModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="currencyModalLabel" aria-hidden="true">
+
+
+    <div class="modal fade" id="currencyModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="currencyModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content bg-info">
                 <div class="modal-header border-0 bg-warning text-white">
@@ -153,7 +219,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-white">
-                    <form id="currency-form">
+                  <div class="pre-load"></div>
+                    <form id="currency-form" name="currencyForm">
                         <div class="form-floating mb-3">
                             <input id="fromAmount" name="fromAmount" type="number" class="form-control" value="1" min="1" step="1">
                             <label for="fromAmount">From USD</label>
@@ -175,13 +242,14 @@
     </div>
   
 <div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content bg-info">
       <div class="modal-header border-0 bg-warning text-white">
         <h5 class="modal-title" id="newsModalLabel">Latest News</h5>
         <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <div class="pre-load"></div>
         <div id="newsContent" class="text-justify">
         </div>
       </div>
@@ -212,6 +280,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body bg-warning">
+              <div class="pre-load"></div>
                 <img id="capitalImage" src="" alt="Capital Image" class="img-fluid mb-3" style="display: block; margin-left: auto; margin-right: auto;">
                 <p id="capitalSummary" class="text-justify">Loading...</p>
             </div>
@@ -225,11 +294,11 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin="anonymous"></script>
       <script src="vendors/LeafletEasyButton/src/easy-button.js"></script>
-      <script src="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.js"></script>
-      <script src="vendors/Leaflet.markercluster/leaflet.markercluster.js"></script>
-      <script src="vendors/toastify/toastify.js"></script>
-      <script src="libs/js/numeral.min.js"></script>
-      <script src="libs/js/date-en-GB.js"></script>
+  	  <script src="vendors/LeafletExtraMarkers/leaflet.extra-markers.min.js"></script>
+  	  <script src="vendors/Leaflet.markercluster/leaflet.markercluster.js"></script>
+  	  <script src="vendors/toastify/toastify.js"></script>
+	  <script src="libs/js/numeral.min.js"></script>
+  	  <script src="libs/js/date-en-GB.js"></script>
       <script src="libs/js/script.js"></script>
 </body>
 
