@@ -1,29 +1,4 @@
 $(document).ready(function () {
-    // Function to hide preloader
-    function hidePreloader() {
-        $('#preloader').addClass('hidden');
-    }
-
-    // Show the preloader on page load
-    $(window).on('load', function () {
-        $('#preloader').removeClass('hidden');
-    });
-
-    function showToast(message, duration, close) {
-        Toastify({
-            text: message,
-            duration: duration,
-            close: close,
-            gravity: "top",
-            position: "center",
-            stopOnFocus: true,
-            style: {
-                background: "#ffc107",
-                color: "#0E46A3",
-                borderRadius: "10px"
-            }
-        }).showToast();
-    }
 
     let map;
     let currentGeoJsonLayer = null;
@@ -122,6 +97,168 @@ $(document).ready(function () {
         Museums: museumsCG,
         Hotels: hotelsCG
     };
+
+    $(window).on('load', function () {
+        $('#preloader').removeClass('hidden');
+    });
+
+    $('#countrySelect').change(function () {
+        const countryCode = $(this).val();
+        removePreviousData();
+        displayCountryBorders(countryCode);
+        fetchCountryInfo(countryCode);
+        fetchCountryAirports(countryCode);
+        fetchCountryParks(countryCode);
+        fetchCountryStadiums(countryCode);
+        fetchCountryMuseums(countryCode);
+        fetchCountryHotels(countryCode);
+        setCurrencyForCountry(countryCode);
+    });
+
+    $('#weatherModal').on('hidden.bs.modal', function (e) {
+        $('.pre-load').removeClass("fadeOut");
+        $('#todayConditions').html("");
+        $('#todayIcon').attr("src", "");
+        $('#todayMaxTemp').html("");
+        $('#todayMinTemp').html("");
+        $('#day1Date').text("");
+        $('#day1Icon').attr("src", "");
+        $('#day1MinTemp').text("");
+        $('#day1MaxTemp').text("");
+        $('#day2Date').text("");
+        $('#day2Icon').attr("src", "");
+        $('#day2MinTemp').text("");
+        $('#day2MaxTemp').text("");
+        $('#day3Date').text("");
+        $('#day3Icon').attr("src", "");
+        $('#day3MinTemp').text("");
+        $('#day3MaxTemp').text("");
+        $('#lastUpdated').text("");
+    });
+
+    $('#currencyModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+        resetCurrencyForm();
+        const countryCode = $('#countrySelect').val() || detectedCountryCode;
+        fetchCurrencies(countryCode);
+    });
+
+    $('#currency-form').on('submit', function(e) {
+        e.preventDefault();
+        convertCurrency();
+    });
+
+    $('#fromAmount').on('keyup', function () {
+        calcResult();
+    });
+
+    $('#fromAmount').on('change', function () {
+        calcResult();
+    });
+
+    $('#exchangeRate').on('change', function () {
+        calcResult();
+    });
+
+    $('#newsModal').on('show.bs.modal', function () {
+        $('.pre-load').removeClass("fadeOut");
+        const countryCode = $('#countrySelect').val() || detectedCountryCode;
+
+        let newsLoaded = false;
+
+        $.ajax({
+            url: 'libs/php/getNews.php',
+            type: 'GET',
+            data: {
+                country: countryCode
+            },
+            dataType: 'json',
+            timeout: 5000, 
+            success: function (data) {
+                const newsContent = $('#newsContent');
+                newsContent.empty();
+
+                if (data.error) {
+                    if (!newsLoaded) {
+                        newsContent.html('<p class="text-danger">No latest news are available for this region now.</p>');
+                    }
+                } else if (data.news && data.news.length > 0) {
+                    newsLoaded = true;
+                    const articles = data.news;
+                    articles.sort((a, b) => new Date(b.published) - new Date(a.published));
+                    articles.forEach(article => {
+                        const timeAgo = timeDifference(new Date(), new Date(article.published));
+                        const articleHtml = `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">${article.title}</h5>
+                                    <p class="card-text">${article.description || ''}</p>
+                                    <p class="card-text"><small class="text-muted">Published: ${timeAgo}</small></p>
+                                </div>
+                            </div>
+                        `;
+                        const articleElement = $(articleHtml);
+                        if (article.image && article.image !== "None") {
+                            const img = new Image();
+                            img.src = article.image;
+                            img.className = "card-img-top";
+                            img.style = "width: 100%; height: auto;";
+                            img.alt = article.title;
+                            img.onload = function () {
+                                articleElement.prepend(img);
+                            };
+                            img.onerror = function () {
+                                console.warn('Image failed to load: ' + article.image);
+                            };
+                        }
+                        newsContent.append(articleElement);
+                    });
+                    $('.pre-load').addClass("fadeOut");
+                } else {
+                    if (!newsLoaded) {
+                        newsContent.html('<p class="text-danger">No latest news are available for this region now.</p>');
+                    }
+                    $('.pre-load').addClass("fadeOut");
+                }
+            },
+            error: function (xhr, textStatus, error) {
+                if (!newsLoaded) {
+                    $('#newsContent').html('<p class="text-danger">No latest news are available for this region now.</p>');
+                }
+
+                const response = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+                if (textStatus !== 'timeout' && (!response.error || response.error !== 'No news available')) {
+                    showToast('Failed to fetch news: ' + error, 4000, false);
+                }
+
+                $('.pre-load').addClass("fadeOut");
+            }
+        });
+    });
+
+    $('#newsModal').on('hidden.bs.modal', function (e) {
+        $('.pre-load').removeClass("fadeOut");
+    });
+
+    function hidePreloader() {
+        $('#preloader').addClass('hidden');
+    }
+
+    function showToast(message, duration, close) {
+        Toastify({
+            text: message,
+            duration: duration,
+            close: close,
+            gravity: "top",
+            position: "center",
+            stopOnFocus: true,
+            style: {
+                background: "#ffc107",
+                color: "#0E46A3",
+                borderRadius: "10px"
+            }
+        }).showToast();
+    }
 
     function initializeMap(accessToken) {
         map = L.map('map', {
@@ -306,31 +443,23 @@ $(document).ready(function () {
                         } else {
                             showToast('Error fetching country code', 4000, true);
                         }
-                        // Hide preloader after first country data is loaded
+
                         hidePreloader();
                     },
                     error: function (xhr, status, error) {
                         showToast('Error detecting user country', 4000, true);
-                        // Hide preloader in case of error
                         hidePreloader();
                     }
                 });
             }, function (error) {
                 showToast('Error in geolocation: ' + error.message, 4000, true);
-                // Hide preloader in case of error
                 hidePreloader();
             });
         } else {
             showToast("Geolocation is not supported by this browser.", 4000, true);
-            // Hide preloader in case geolocation is not supported
             hidePreloader();
         }
     }
-
-    $('#countrySelect').change(function () {
-        const countryCode = $(this).val();
-        fetchCapitalWeather(countryCode);
-    });
 
     function fetchCapitalWeather(countryCode) {
         $.ajax({
@@ -382,73 +511,22 @@ $(document).ready(function () {
                     $('#day2Icon').attr("src", d.forecast[2].conditionIcon);
                     $('#day2MinTemp').text(numeral(d.forecast[2].minC).format('0'));
                     $('#day2MaxTemp').text(numeral(d.forecast[2].maxC).format('0'));
-                    $('#day3Date').text(new Date(d.forecast[3].date).toString("ddd dS")); // Update for the third day
-                    $('#day3Icon').attr("src", d.forecast[3].conditionIcon); // Update for the third day
-                    $('#day3MinTemp').text(numeral(d.forecast[3].minC).format('0')); // Update for the third day
-                    $('#day3MaxTemp').text(numeral(d.forecast[3].maxC).format('0')); // Update for the third day
+                    $('#day3Date').text(new Date(d.forecast[3].date).toString("ddd dS")); 
+                    $('#day3Icon').attr("src", d.forecast[3].conditionIcon); 
+                    $('#day3MinTemp').text(numeral(d.forecast[3].minC).format('0')); 
+                    $('#day3MaxTemp').text(numeral(d.forecast[3].maxC).format('0')); 
                     $('#lastUpdated').text(new Date(d.lastUpdated).toString("HH:mm, dS MMM"));
-                    $('.pre-load').addClass("fadeOut"); // Hide the spinner
+                    $('.pre-load').addClass("fadeOut"); 
                 } else {
                     showToast('Error retrieving data', 4000, true);
-                    $('.pre-load').addClass("fadeOut"); // Hide the spinner in case of error
+                    $('.pre-load').addClass("fadeOut"); 
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 showToast('Error retrieving data', 4000, true);
-                $('.pre-load').addClass("fadeOut"); // Hide the spinner in case of error
+                $('.pre-load').addClass("fadeOut"); 
             }
         });
-    }
-
-    $('#weatherModal').on('hidden.bs.modal', function (e) {
-        $('.pre-load').removeClass("fadeOut");
-        $('#todayConditions').html("");
-        $('#todayIcon').attr("src", "");
-        $('#todayMaxTemp').html("");
-        $('#todayMinTemp').html("");
-        $('#day1Date').text("");
-        $('#day1Icon').attr("src", "");
-        $('#day1MinTemp').text("");
-        $('#day1MaxTemp').text("");
-        $('#day2Date').text("");
-        $('#day2Icon').attr("src", "");
-        $('#day2MinTemp').text("");
-        $('#day2MaxTemp').text("");
-        $('#day3Date').text(""); // Reset for the third day
-        $('#day3Icon').attr("src", ""); // Reset for the third day
-        $('#day3MinTemp').text(""); // Reset for the third day
-        $('#day3MaxTemp').text(""); // Reset for the third day
-        $('#lastUpdated').text("");
-    });
-
-     $('#currencyModal').on('show.bs.modal', function () {
-        $('.pre-load').removeClass("fadeOut");
-        resetCurrencyForm();
-        const countryCode = $('#countrySelect').val() || detectedCountryCode;
-        fetchCurrencies(countryCode);
-    });
-
-    $('#currency-form').on('submit', function(e) {
-        e.preventDefault();
-        convertCurrency();
-    });
-
-    $('#fromAmount').on('keyup', function () {
-        calcResult();
-    });
-
-    $('#fromAmount').on('change', function () {
-        calcResult();
-    });
-
-    $('#exchangeRate').on('change', function () {
-        calcResult();
-    });
-
-    function resetCurrencyForm() {
-        $('#fromAmount').val(1);
-        $('#exchangeRate').val($('#exchangeRate option:first').val());
-        $('#toAmount').val('');
     }
 
     function fetchCurrencies(countryCode) {
@@ -462,7 +540,7 @@ $(document).ready(function () {
                     showToast(data.error, 4000, true, "#ffffff");
                 } else {
                     populateCurrencySelect(data);
-                    setCurrencyForCountry(countryCode); // Ensure currency is set after fetching
+                    setCurrencyForCountry(countryCode);
                 }
                 $('.pre-load').addClass("fadeOut"); 
             },
@@ -496,7 +574,7 @@ $(document).ready(function () {
                     const countryInfo = result[0];
                     const currencyCode = Object.keys(countryInfo.currencies)[0];
                     $('#exchangeRate').val(currencyCode).change();
-                    console.log('Selected Exchange Rate Code:', currencyCode); // Log the selected currency code
+                    console.log('Selected Exchange Rate Code:', currencyCode);
                 } else {
                     console.error('No data found for country code:', countryCode);
                 }
@@ -572,31 +650,12 @@ $(document).ready(function () {
         });
     }
 
-    $('#countrySelect').change(function () {
-        const countryCode = $(this).val();
-        removePreviousData();
-        displayCountryBorders(countryCode);
-        fetchCountryInfo(countryCode);
-        fetchCountryAirports(countryCode);
-        fetchCountryParks(countryCode);
-        fetchCountryStadiums(countryCode);
-        fetchCountryMuseums(countryCode);
-        fetchCountryHotels(countryCode);
-        setCurrencyForCountry(countryCode); // Add this line to update currency when country changes
-    });
-    $('#countrySelect').change(function () {
-        const countryCode = $(this).val();
-        removePreviousData();
-        displayCountryBorders(countryCode);
-        fetchCountryInfo(countryCode);
-        fetchCountryAirports(countryCode);
-        fetchCountryParks(countryCode);
-        fetchCountryStadiums(countryCode);
-        fetchCountryMuseums(countryCode);
-        fetchCountryHotels(countryCode);
-        setCurrencyForCountry(countryCode); // Add this line to update currency when country changes
-    });
-    
+    function resetCurrencyForm() {
+        $('#fromAmount').val(1);
+        $('#exchangeRate').val($('#exchangeRate option:first').val());
+        $('#toAmount').val('');
+    }
+
     function updateCountryInfo(countryInfo) {
         $('#countryName').html(countryInfo.name.common || 'N/A');
         $('#capital').html(countryInfo.capital ? countryInfo.capital[0] : 'N/A');
@@ -627,18 +686,6 @@ $(document).ready(function () {
             $('#capitalModal').modal('show');
         });
     }
-
-    $('#countrySelect').change(function () {
-        const countryCode = $(this).val();
-        removePreviousData();
-        displayCountryBorders(countryCode);
-        fetchCountryInfo(countryCode);
-        fetchCountryAirports(countryCode);
-        fetchCountryParks(countryCode);
-        fetchCountryStadiums(countryCode);
-        fetchCountryMuseums(countryCode);
-        fetchCountryHotels(countryCode);
-    });
 
     function removePreviousData() {
         removeCapitalMarker();
@@ -852,87 +899,6 @@ $(document).ready(function () {
         });
     }
 
-    $('#newsModal').on('show.bs.modal', function () {
-        $('.pre-load').removeClass("fadeOut");
-        const countryCode = $('#countrySelect').val() || detectedCountryCode;
-
-        let newsLoaded = false;
-
-        $.ajax({
-            url: 'libs/php/getNews.php',
-            type: 'GET',
-            data: {
-                country: countryCode
-            },
-            dataType: 'json',
-            timeout: 5000, // Set timeout to 5 seconds
-            success: function (data) {
-                const newsContent = $('#newsContent');
-                newsContent.empty();
-
-                if (data.error) {
-                    if (!newsLoaded) {
-                        newsContent.html('<p class="text-danger">No latest news are available for this region now.</p>');
-                    }
-                } else if (data.news && data.news.length > 0) {
-                    newsLoaded = true;
-                    const articles = data.news;
-                    articles.sort((a, b) => new Date(b.published) - new Date(a.published));
-                    articles.forEach(article => {
-                        const timeAgo = timeDifference(new Date(), new Date(article.published));
-                        const articleHtml = `
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">${article.title}</h5>
-                                    <p class="card-text">${article.description || ''}</p>
-                                    <p class="card-text"><small class="text-muted">Published: ${timeAgo}</small></p>
-                                </div>
-                            </div>
-                        `;
-                        const articleElement = $(articleHtml);
-                        if (article.image && article.image !== "None") {
-                            const img = new Image();
-                            img.src = article.image;
-                            img.className = "card-img-top";
-                            img.style = "width: 100%; height: auto;";
-                            img.alt = article.title;
-                            img.onload = function () {
-                                articleElement.prepend(img);
-                            };
-                            img.onerror = function () {
-                                console.warn('Image failed to load: ' + article.image);
-                            };
-                        }
-                        newsContent.append(articleElement);
-                    });
-                    $('.pre-load').addClass("fadeOut");
-                } else {
-                    if (!newsLoaded) {
-                        newsContent.html('<p class="text-danger">No latest news are available for this region now.</p>');
-                    }
-                    $('.pre-load').addClass("fadeOut");
-                }
-            },
-            error: function (xhr, textStatus, error) {
-                if (!newsLoaded) {
-                    $('#newsContent').html('<p class="text-danger">No latest news are available for this region now.</p>');
-                }
-
-                // Show toast instead of console error
-                const response = xhr.responseText ? JSON.parse(xhr.responseText) : {};
-                if (textStatus !== 'timeout' && (!response.error || response.error !== 'No news available')) {
-                    showToast('Failed to fetch news: ' + error, 4000, false);
-                }
-
-                $('.pre-load').addClass("fadeOut");
-            }
-        });
-    });
-
-    $('#newsModal').on('hidden.bs.modal', function (e) {
-        $('.pre-load').removeClass("fadeOut");
-    });
-
     function timeDifference(current, previous) {
         const msPerMinute = 60 * 1000;
         const msPerHour = msPerMinute * 60;
@@ -1111,7 +1077,7 @@ $(document).ready(function () {
                     if (result.extract) {
                         $('#wikiSummary').html(result.extract);
                         $('#wikiTitle').html(result.title);
-                        fetchCountryFlag(countryCode); // Ensure this function is updated
+                        fetchCountryFlag(countryCode); 
                         $('.pre-load').addClass("fadeOut");
                     } else {
                         $('#wikiSummary').html('No information available.');
