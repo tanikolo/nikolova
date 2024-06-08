@@ -207,9 +207,7 @@ $(document).ready(function () {
                             img.onload = function () {
                                 articleElement.prepend(img);
                             };
-                            img.onerror = function () {
-                                console.warn('Image failed to load: ' + article.image);
-                            };
+                            img.onerror = function () {};
                         }
                         newsContent.append(articleElement);
                     });
@@ -472,7 +470,6 @@ $(document).ready(function () {
                     const lat = countryInfo.capitalInfo.latlng[0];
                     const lon = countryInfo.capitalInfo.latlng[1];
                     capitalName = countryInfo.capital ? countryInfo.capital[0] : 'Unknown';
-                    console.log(`Capital Coordinates: ${capitalName}, ${countryInfo.name.common}: lat=${lat}, lon=${lon}`);
                     fetchWeatherData(lat, lon, capitalName, countryInfo.name.common);
                 } else {
                     showToast('No data found for country code', 4000, true);
@@ -485,7 +482,6 @@ $(document).ready(function () {
     }
 
     function fetchWeatherData(lat, lon, capital, country) {
-        console.log(`Fetching weather data for ${capital}, ${country}: lat=${lat}, lon=${lon}`);
         $.ajax({
             url: "libs/php/getWeather.php",
             type: 'POST',
@@ -495,7 +491,6 @@ $(document).ready(function () {
                 lon: lon
             },
             success: function (result) {
-                console.log('Weather API response:', result);
                 if (result.status.code === 200) {
                     var d = result.data;
                     $('#weatherModalLabel').html(capital + ", " + country);
@@ -535,7 +530,6 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'json',
             success: function (data) {
-                console.log('Fetched data:', data); 
                 if (data.error) {
                     showToast(data.error, 4000, true, "#ffffff");
                 } else {
@@ -546,7 +540,6 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 showToast('Error fetching currencies', 4000, true, "#ffffff");
-                console.log('Error details:', error); 
                 $('.pre-load').addClass("fadeOut"); 
             }
         });
@@ -559,7 +552,6 @@ $(document).ready(function () {
         const currencyArray = Object.entries(currencies);
 
         currencyArray.forEach(([code, name]) => {
-            console.log('Adding option:', code, name); 
             select.append($('<option>', { value: code, text: `${name} (${code})` }));
         });
     }
@@ -574,23 +566,15 @@ $(document).ready(function () {
                     const countryInfo = result[0];
                     const currencyCode = Object.keys(countryInfo.currencies)[0];
                     $('#exchangeRate').val(currencyCode).change();
-                    console.log('Selected Exchange Rate Code:', currencyCode);
-                } else {
-                    console.error('No data found for country code:', countryCode);
                 }
             },
-            error: function (xhr, status, error) {
-                console.log('Error fetching country info:', error);
-            }
+            error: function (xhr, status, error) {}
         });
     }
 
     function calcResult() {
         const fromAmount = parseFloat($('#fromAmount').val());
         const exchangeRateCode = $('#exchangeRate').val();
-
-        console.log('From Amount:', fromAmount);
-        console.log('Selected Exchange Rate Code:', exchangeRateCode);
 
         if (isNaN(fromAmount) || !exchangeRateCode || fromAmount <= 0) {
             $('#toAmount').val('');
@@ -600,7 +584,6 @@ $(document).ready(function () {
 
         fetchExchangeRate(exchangeRateCode, function(exchangeRate) {
             const result = fromAmount * exchangeRate;
-            console.log('Result:', result);
             $('#toAmount').val(numeral(result).format("0,0.00"));
             $('.pre-load').addClass("fadeOut"); 
         });
@@ -613,7 +596,6 @@ $(document).ready(function () {
             data: { code: code },
             dataType: 'json',
             success: function(data) {
-                console.log('Fetched exchange rate data:', data); 
                 if (data && data.rate) {
                     callback(data.rate);
                 } else {
@@ -623,7 +605,6 @@ $(document).ready(function () {
             },
             error: function(xhr, status, error) {
                 showToast('Error fetching exchange rate', 4000, true, "#ffffff");
-                console.log('Error details:', error); 
                 $('.pre-load').addClass("fadeOut"); 
             }
         });
@@ -633,9 +614,6 @@ $(document).ready(function () {
         const fromAmount = parseFloat($('#fromAmount').val());
         const exchangeRateCode = $('#exchangeRate').val();
 
-        console.log('From Amount:', fromAmount);
-        console.log('Selected Exchange Rate Code:', exchangeRateCode);
-
         if (isNaN(fromAmount) || !exchangeRateCode || fromAmount <= 0) {
             showToast("Invalid input. Please enter a valid amount.", 4000, true, "#ffffff");
             return;
@@ -643,7 +621,6 @@ $(document).ready(function () {
 
         fetchExchangeRate(exchangeRateCode, function(exchangeRate) {
             const toAmount = fromAmount * exchangeRate;
-            console.log('To Amount:', toAmount);
             $('#toAmount').val(toAmount.toFixed(2));
             showToast("Conversion successful!", 4000, true, "#ffffff");
             $('.pre-load').addClass("fadeOut"); 
@@ -1007,18 +984,12 @@ $(document).ready(function () {
 
                     if (capitalLat && capitalLon) {
                         addCapitalMarker(capitalName, capitalLat, capitalLon);
-                    } else {
-                        showToast('Invalid capital coordinates', 4000, true);
                     }
-                } else {
-                    showToast('No data found for country code', 4000, true);
                 }
             },
             error: function (xhr, status, error) {
                 if (retries > 0) {
                     setTimeout(() => fetchCountryInfo(countryCode, lat, lon, countryName, retries - 1), 2000);
-                } else {
-                    showToast('Error fetching country info', 4000, true);
                 }
             }
         });
@@ -1048,8 +1019,6 @@ $(document).ready(function () {
                         $('#population').html(numeral(countryInfo.population).format("0,0"));
                         $('#area').html(numeral(countryInfo.area).format("0,0") + ' km²');
                         $('.pre-load').addClass("fadeOut");
-                    } else {
-                        showToast("Error retrieving country data", 4000, true);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
