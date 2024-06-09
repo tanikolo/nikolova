@@ -16,7 +16,18 @@ if (!isset($_GET['countryCode'])) {
 
 $countryCode = $_GET['countryCode'];
 
-$geoJsonFile = 'countryBorders.geo.json'; 
+if (!preg_match('/^[A-Z]{2}$/i', $countryCode)) {
+    echo json_encode([
+        'status' => [
+            'code' => 400,
+            'name' => 'error',
+            'description' => 'Invalid country code'
+        ]
+    ]);
+    exit;
+}
+
+$geoJsonFile = 'countryBorders.geo.json';
 
 if (!file_exists($geoJsonFile)) {
     echo json_encode([
@@ -31,6 +42,17 @@ if (!file_exists($geoJsonFile)) {
 
 $result = file_get_contents($geoJsonFile);
 
+if ($result === false) {
+    echo json_encode([
+        'status' => [
+            'code' => 500,
+            'name' => 'error',
+            'description' => 'Failed to read GeoJSON file'
+        ]
+    ]);
+    exit;
+}
+
 $decode = json_decode($result, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -38,7 +60,18 @@ if (json_last_error() !== JSON_ERROR_NONE) {
         'status' => [
             'code' => 500,
             'name' => 'error',
-            'description' => 'Invalid JSON data'
+            'description' => 'JSON decode error: ' . json_last_error_msg()
+        ]
+    ]);
+    exit;
+}
+
+if (!isset($decode['features'])) {
+    echo json_encode([
+        'status' => [
+            'code' => 500,
+            'name' => 'error',
+            'description' => 'Invalid GeoJSON structure: "features" key missing'
         ]
     ]);
     exit;
@@ -69,7 +102,6 @@ $output['status']['description'] = 'success';
 $output['data'] = $countryFeature;
 
 header('Content-Type: application/json; charset=UTF-8');
-
 echo json_encode($output);
 
 ?>
