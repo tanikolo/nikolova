@@ -16,10 +16,34 @@ if (!isset($_GET['lat']) || !isset($_GET['lon'])) {
 
 $lat = $_GET['lat'];
 $lon = $_GET['lon'];
-$apiKey = '65c121c9fa444dd7ae03527cd459f0be';
-$url = "https://api.opencagedata.com/geocode/v1/json?q=" . $lat . "+" . $lon . "&key=" . $apiKey;
+
+if (!is_numeric($lat) || $lat < -90 || $lat > 90) {
+    echo json_encode([
+        'status' => [
+            'code' => 400,
+            'name' => 'error',
+            'description' => 'Invalid latitude value'
+        ]
+    ]);
+    exit;
+}
+
+if (!is_numeric($lon) || $lon < -180 || $lon > 180) {
+    echo json_encode([
+        'status' => [
+            'code' => 400,
+            'name' => 'error',
+            'description' => 'Invalid longitude value'
+        ]
+    ]);
+    exit;
+}
+
+$geonamesUsername = 'tanikolo';
+$url = "http://api.geonames.org/countryCodeJSON?lat=" . $lat . "&lng=" . $lon . "&username=" . $geonamesUsername;
 
 $ch = curl_init();
+
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_URL, $url);
@@ -42,17 +66,26 @@ curl_close($ch);
 
 $decode = json_decode($result, true);
 
-if (isset($decode['results'][0]['components']['country_code'])) {
-    $countryCode = strtoupper($decode['results'][0]['components']['country_code']);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode([
+        'status' => [
+            'code' => 500,
+            'name' => 'error',
+            'description' => 'JSON decode error: ' . json_last_error_msg()
+        ]
+    ]);
+    exit;
+}
+
+if (isset($decode['countryCode'])) {
     echo json_encode([
         'status' => [
             'code' => 200,
             'name' => 'ok',
             'description' => 'success'
         ],
-        'data' => [
-            'countryCode' => $countryCode
-        ]
+        'countryCode' => $decode['countryCode'],
+        'countryName' => $decode['countryName']
     ]);
 } else {
     echo json_encode([
