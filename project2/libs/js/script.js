@@ -193,8 +193,82 @@ $(document).ready(function() {
         }
       });
     }
-  
-    populatePersonnelTable();
+
+    function handleFilter(departmentID, locationID) {
+    $.ajax({
+      url: 'libs/php/filterPersonnel.php',
+      method: 'POST',
+      dataType: 'json',
+      data: { departmentID: departmentID, locationID: locationID },
+      success: function(response) {
+        console.log('Response from filterPersonnel.php:', response);
+        if (response.status.code === "200" && response.data) {
+          const personnel = response.data;
+          const personnelTableBody = $("#personnelTableBody");
+          personnelTableBody.empty();
+
+          personnel.forEach(person => {
+            const row = `
+              <tr>
+                <td class="align-middle text-nowrap">${person.firstName}, ${person.lastName}</td>
+                <td class="align-middle text-nowrap d-none d-md-table-cell">${person.departmentName}</td>
+                <td class="align-middle text-nowrap d-none d-md-table-cell">${person.locationName}</td>
+                <td class="align-middle text-nowrap d-none d-md-table-cell">${person.email}</td>
+              </tr>
+            `;
+            personnelTableBody.append(row);
+          });
+        } else {
+          console.error('Failed to fetch filtered personnel data:', response.status.description);
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error('Error fetching filtered personnel data:', textStatus, errorThrown, jqXHR.responseText);
+      }
+    });
+  }
+
+  function populateFilterOptions() {
+    $.ajax({
+      url: 'libs/php/getAllDepartments.php',
+      method: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        if (response.status.code === "200" && response.data) {
+          const departments = response.data;
+          const filterDepartment = $("#filterDepartment");
+          filterDepartment.empty();
+          filterDepartment.append('<option value="">All Departments</option>');
+          departments.forEach(department => {
+            filterDepartment.append(`<option value="${department.id}">${department.name}</option>`);
+          });
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error('Error fetching department options:', textStatus, errorThrown, jqXHR.responseText);
+      }
+    });
+
+    $.ajax({
+      url: 'libs/php/getLocations.php',
+      method: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        if (response.status.code === "200" && response.data) {
+          const locations = response.data;
+          const filterLocation = $("#filterLocation");
+          filterLocation.empty();
+          filterLocation.append('<option value="">All Locations</option>');
+          locations.forEach(location => {
+            filterLocation.append(`<option value="${location.id}">${location.name}</option>`);
+          });
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error('Error fetching location options:', textStatus, errorThrown, jqXHR.responseText);
+      }
+    });
+  }
   
     $("#searchInp").on("keyup", function () {
       const query = $(this).val();
@@ -218,4 +292,19 @@ $(document).ready(function() {
     $("#locationsBtn").click(function () {
       populateLocationTable();
     });
+
+    $("#filterBtn").click(function () {
+    populateFilterOptions();
+    $("#filterModal").modal("show");
+  });
+
+    $("#filterForm").on("submit", function (e) {
+    e.preventDefault();
+    const departmentID = $("#filterDepartment").val();
+    const locationID = $("#filterLocation").val();
+    handleFilter(departmentID, locationID);
+    $("#filterModal").modal("hide");
+  });
+
+    populatePersonnelTable();
   });
