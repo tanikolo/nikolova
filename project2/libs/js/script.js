@@ -41,6 +41,49 @@ $(document).ready(function() {
       });
     }
   
+ function populateDepartmentTable() {
+      $.ajax({
+        url: 'libs/php/getAllDepartments.php',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          console.log('Response from getAllDepartments.php:', response);
+          if (response.status.code === "200" && response.data) {
+            const departments = response.data;
+            const departmentTableBody = $("#departmentTableBody");
+            departmentTableBody.empty();
+  
+            departments.forEach(department => {
+              const row = `
+                <tr>
+                  <td class="align-middle text-nowrap">${department.name}</td>
+                  <td class="align-middle text-nowrap d-none d-md-table-cell">${department.locationID}</td>
+                  <td class="text-end text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="${department.id}">
+                      <i class="fa-solid fa-pencil fa-fw"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="${department.id}">
+                      <i class="fa-solid fa-trash fa-fw"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+              departmentTableBody.append(row);
+            });
+          } else {
+            console.error('Failed to fetch department data:', response.status.description);
+          }
+        },
+        error: function(error) {
+          console.error('Error fetching department data:', error);
+        }
+      });
+    }
+  
     populatePersonnelTable();
   
+    $("#departmentsBtn").click(function () {
+      populateDepartmentTable();
+    });
+
   });
