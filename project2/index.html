@@ -171,6 +171,33 @@
         </footer>
       
       </section>
+
+    <div id="filterModal" class="modal fade" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filterModalLabel">Filter Personnel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="filterForm">
+          <div class="mb-3">
+            <label for="filterDepartment" class="form-label">Department</label>
+            <select class="form-select" id="filterDepartment">
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="filterLocation" class="form-label">Location</label>
+            <select class="form-select" id="filterLocation">
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Apply Filter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
           
       <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
         
