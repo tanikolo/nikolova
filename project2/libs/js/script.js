@@ -82,7 +82,7 @@ $(document).ready(function() {
   
     function populateLocationTable() {
       $.ajax({
-        url: 'libs/php/getAllLocations.php', 
+        url: 'libs/php/getLocations.php', 
         method: 'GET',
         dataType: 'json',
         success: function(response) {
@@ -118,12 +118,93 @@ $(document).ready(function() {
       });
     }
 
+    function handleSearch(query) {
+      $.ajax({
+        url: 'libs/php/SearchAll.php',
+        method: 'POST',
+        dataType: 'json',
+        data: { txt: query },
+        success: function(response) {
+          console.log('Response from SearchAll.php:', response);
+          if (response.status.code === "200" && response.data.found) {
+            const results = response.data.found;
+            const personnelTableBody = $("#personnelTableBody");
+            const departmentTableBody = $("#departmentTableBody");
+            const locationTableBody = $("#locationTableBody");
+  
+            personnelTableBody.empty();
+            departmentTableBody.empty();
+            locationTableBody.empty();
+  
+            results.forEach(item => {
+              const personnelRow = `
+                <tr>
+                  <td class="align-middle text-nowrap">${item.firstName}, ${item.lastName}</td>
+                  <td class="align-middle text-nowrap d-none d-md-table-cell">${item.departmentName}</td>
+                  <td class="align-middle text-nowrap d-none d-md-table-cell">${item.locationName}</td>
+                  <td class="align-middle text-nowrap d-none d-md-table-cell">${item.email}</td>
+                  <td class="text-end text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${item.id}">
+                      <i class="fa-solid fa-pencil fa-fw"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${item.id}">
+                      <i class="fa-solid fa-trash fa-fw"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+              const departmentRow = `
+                <tr>
+                  <td class="align-middle text-nowrap">${item.departmentName}</td>
+                  <td class="align-middle text-nowrap d-none d-md-table-cell">${item.locationName}</td>
+                  <td class="text-end text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="${item.departmentID}">
+                      <i class="fa-solid fa-pencil fa-fw"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="${item.departmentID}">
+                      <i class="fa-solid fa-trash fa-fw"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+              const locationRow = `
+                <tr>
+                  <td class="align-middle text-nowrap">${item.locationName}</td>
+                  <td class="text-end text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="${item.locationID}">
+                      <i class="fa-solid fa-pencil fa-fw"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm deleteLocationBtn" data-id="${item.locationID}">
+                      <i class="fa-solid fa-trash fa-fw"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+              personnelTableBody.append(personnelRow);
+              departmentTableBody.append(departmentRow);
+              locationTableBody.append(locationRow);
+            });
+          } else {
+            console.error('Failed to fetch search results:', response.status.description);
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.error('Error fetching search results:', textStatus, errorThrown, jqXHR.responseText);
+        }
+      });
+    }
+  
     populatePersonnelTable();
+  
+    $("#searchInp").on("keyup", function () {
+      const query = $(this).val();
+      handleSearch(query);
+    });
   
     $("#departmentsBtn").click(function () {
       populateDepartmentTable();
     });
-
+  
     $("#locationsBtn").click(function () {
       populateLocationTable();
     });
