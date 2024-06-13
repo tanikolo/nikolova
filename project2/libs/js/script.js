@@ -200,6 +200,16 @@ $(document).ready(function() {
       const query = $(this).val();
       handleSearch(query);
     });
+
+    $("#refreshBtn").click(function () {
+      if ($("#personnelBtn").hasClass("active")) {
+        populatePersonnelTable();
+      } else if ($("#departmentsBtn").hasClass("active")) {
+        populateDepartmentTable();
+      } else if ($("#locationsBtn").hasClass("active")) {
+        populateLocationTable();
+      }
+    });
   
     $("#departmentsBtn").click(function () {
       populateDepartmentTable();
