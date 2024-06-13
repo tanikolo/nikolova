@@ -80,10 +80,51 @@ $(document).ready(function() {
       });
     }
   
+    function populateLocationTable() {
+      $.ajax({
+        url: 'libs/php/getAllLocations.php', 
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          console.log('Response from getAllLocations.php:', response);
+          if (response.status.code === "200" && response.data) {
+            const locations = response.data;
+            const locationTableBody = $("#locationTableBody");
+            locationTableBody.empty();
+  
+            locations.forEach(location => {
+              const row = `
+                <tr>
+                  <td class="align-middle text-nowrap">${location.name}</td>
+                  <td class="text-end text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="${location.id}">
+                      <i class="fa-solid fa-pencil fa-fw"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm deleteLocationBtn" data-id="${location.id}">
+                      <i class="fa-solid fa-trash fa-fw"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+              locationTableBody.append(row);
+            });
+          } else {
+            console.error('Failed to fetch location data:', response.status.description);
+          }
+        },
+        error: function(error) {
+          console.error('Error fetching location data:', error);
+        }
+      });
+    }
+
     populatePersonnelTable();
   
     $("#departmentsBtn").click(function () {
       populateDepartmentTable();
     });
 
+    $("#locationsBtn").click(function () {
+      populateLocationTable();
+    });
   });
