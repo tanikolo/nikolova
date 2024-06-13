@@ -1,8 +1,5 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/searchAll.php?txt=<txt>
-
 	// remove next two lines for production
 	
 	ini_set('display_errors', 'On');
@@ -10,7 +7,7 @@
 
 	$executionStartTime = microtime(true);
 
-	include("config.php");
+	include(__DIR__ . "/config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
 
