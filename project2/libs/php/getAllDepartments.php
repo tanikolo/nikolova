@@ -1,74 +1,72 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+$executionStartTime = microtime(true);
 
-	// remove next two lines for production	
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+include(__DIR__ . "/config.php");
 
-	$executionStartTime = microtime(true);
+header('Content-Type: application/json; charset=UTF-8');
 
-	include("config.php");
+if (!isset($host_name) || !isset($user_name) || !isset($password) || !isset($database)) {
+    echo json_encode([
+        'status' => [
+            'code' => '500',
+            'name' => 'failure',
+            'description' => 'Configuration variables are not set'
+        ],
+        'data' => []
+    ]);
+    exit;
+}
 
-	header('Content-Type: application/json; charset=UTF-8');
+$conn = new mysqli($host_name, $user_name, $password, $database);
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+if (mysqli_connect_errno()) {
+    echo json_encode([
+        'status' => [
+            'code' => '300',
+            'name' => 'failure',
+            'description' => 'database unavailable',
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ]);
+    exit;
+}
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+$query = 'SELECT d.id, d.name, l.name as locationName FROM department d LEFT JOIN location l ON l.id = d.locationID ORDER BY d.name';
 
-		mysqli_close($conn);
+$result = $conn->query($query);
 
-		echo json_encode($output);
+if (!$result) {
+    echo json_encode([
+        'status' => [
+            'code' => '400',
+            'name' => 'failure',
+            'description' => 'query failed: ' . $conn->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ]);
+    $conn->close();
+    exit;
+}
 
-		exit;
+$data = [];
 
-	}	
+while ($row = mysqli_fetch_assoc($result)) {
+    array_push($data, $row);
+}
 
-	// SQL does not accept parameters and so is not prepared
+echo json_encode([
+    'status' => [
+        'code' => '200',
+        'name' => 'ok',
+        'description' => 'success',
+        'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+    ],
+    'data' => $data
+]);
 
-	$query = 'SELECT id, name, locationID FROM department';
-
-	$result = $conn->query($query);
-	
-	if (!$result) {
-
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
-
-		mysqli_close($conn);
-
-		echo json_encode($output); 
-
-		exit;
-
-	}
-   
-  $data = [];
-
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
-
-	}
-
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
-	
-	mysqli_close($conn);
-
-	echo json_encode($output); 
+$conn->close();
 
 ?>
