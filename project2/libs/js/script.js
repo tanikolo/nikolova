@@ -111,6 +111,14 @@ $(document).ready(function() {
         });
     }
 
+    function closeModalOnEsc() {
+        $(document).on('keydown', function(event) {
+            if (event.key === "Escape") {
+                $('.modal').modal('hide');
+            }
+        });
+    }
+
     $.when(
         populatePersonnel(),
         populateDepartments(),
@@ -665,7 +673,7 @@ $(document).ready(function() {
                         departmentTableBody.append(row);
                     });
 
-                    $("#filterDepartmentModal").modal('hide'); // Close the filter modal
+                    $("#filterDepartmentModal").modal('hide'); 
                 } else {
                     console.error('Error: ' + response.status.description);
                 }
@@ -928,6 +936,7 @@ $(document).ready(function() {
         });
     }
 
+    closeModalOnEsc();
     populatePersonnel();
     populateDepartments();
     populateLocations();
