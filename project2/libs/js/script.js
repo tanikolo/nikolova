@@ -527,7 +527,7 @@ $(document).ready(function() {
     function searchPersonnel(searchText) {
         $.ajax({
             url: 'libs/php/SearchAll.php',
-            type: 'GET',
+            type: 'POST',
             data: { txt: searchText },
             dataType: 'json',
             success: function (response) {
@@ -566,8 +566,8 @@ $(document).ready(function() {
 
     function searchDepartments(searchText) {
         $.ajax({
-            url: 'libs/php/searchDepartments.php',
-            type: 'GET',
+            url: 'libs/php/SearchDepartments.php',
+            type: 'POST',
             data: { txt: searchText },
             dataType: 'json',
             success: function (response) {
@@ -604,8 +604,8 @@ $(document).ready(function() {
 
     function searchLocations(searchText) {
         $.ajax({
-            url: 'libs/php/searchLocations.php',
-            type: 'GET',
+            url: 'libs/php/SearchLocations.php',
+            type: 'POST',
             data: { txt: searchText },
             dataType: 'json',
             success: function (response) {
@@ -671,9 +671,10 @@ $(document).ready(function() {
                         </tr>`;
 
                         departmentTableBody.append(row);
+
                     });
 
-                    $("#filterDepartmentModal").modal('hide'); 
+                    $("#filterDepartmentModal").modal('hide'); // Close the filter modal
                 } else {
                     console.error('Error: ' + response.status.description);
                 }
