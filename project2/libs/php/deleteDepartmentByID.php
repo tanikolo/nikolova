@@ -1,70 +1,104 @@
 <?php
 
-	// example use from browser
-	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
-	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
+$executionStartTime = microtime(true);
 
-	// remove next two lines for production
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+include(__DIR__ . "/config.php");
 
-	$executionStartTime = microtime(true);
+header('Content-Type: application/json; charset=UTF-8');
 
-	include("config.php");
+$conn = new mysqli($host_name, $user_name, $password, $database);
 
-	header('Content-Type: application/json; charset=UTF-8');
+if (mysqli_connect_errno()) {
+    $output['status']['code'] = "300";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "database unavailable";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    exit;
+}
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+$departmentId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+if ($departmentId === 0) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Invalid department ID";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
-		mysqli_close($conn);
+$checkQuery = $conn->prepare('SELECT COUNT(*) as count FROM personnel WHERE departmentID = ?');
+if (false === $checkQuery) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+$checkQuery->bind_param("i", $departmentId);
+$checkQuery->execute();
+$checkResult = $checkQuery->get_result();
+if (false === $checkResult) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Result fetching failed: " . $checkQuery->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+$row = $checkResult->fetch_assoc();
 
-		echo json_encode($output);
+if ($row['count'] > 0) {
+    $output['status']['code'] = "403";
+    $output['status']['name'] = "forbidden";
+    $output['status']['description'] = "Cannot delete department with assigned personnel";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
-		exit;
+$query = $conn->prepare('DELETE FROM department WHERE id = ?');
+if (false === $query) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+$query->bind_param("i", $departmentId);
+$query->execute();
 
-	}	
+if ($query->affected_rows === 0) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "executed";
+    $output['status']['description'] = "Department not found";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$output['data'] = [];
 
-	$query = $conn->prepare('DELETE FROM department WHERE id = ?');
-	
-	$query->bind_param("i", $_REQUEST['id']);
-
-	$query->execute();
-	
-	if (false === $query) {
-
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
-
-		mysqli_close($conn);
-
-		echo json_encode($output); 
-
-		exit;
-
-	}
-
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
-	
-	mysqli_close($conn);
-
-	echo json_encode($output); 
-
+$conn->close();
+echo json_encode($output);
 ?>
