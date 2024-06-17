@@ -1,79 +1,103 @@
 <?php
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
 
 header('Content-Type: application/json; charset=UTF-8');
 
-if ($link->connect_errno) {
+if (!isset($host_name) || !isset($user_name) || !isset($password) || !isset($database)) {
+    echo json_encode([
+        'status' => [
+            'code' => '500',
+            'name' => 'failure',
+            'description' => 'Configuration variables are not set'
+        ],
+        'data' => []
+    ]);
+    exit;
+}
+
+$conn = new mysqli($host_name, $user_name, $password, $database);
+
+if (mysqli_connect_errno()) {
     $output['status']['code'] = "300";
     $output['status']['name'] = "failure";
-    $output['status']['description'] = "database unavailable: " . $link->connect_error;
+    $output['status']['description'] = "database unavailable";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
     exit;
 }
 
-$departmentID = isset($_POST['departmentID']) ? $_POST['departmentID'] : '';
-$locationID = isset($_POST['locationID']) ? $_POST['locationID'] : '';
+$departmentId = isset($_GET['departmentId']) ? (int)$_GET['departmentId'] : 0;
+$locationId = isset($_GET['locationId']) ? (int)$_GET['locationId'] : 0;
 
-$queryStr = 'SELECT p.id, p.firstName, p.lastName, p.email, p.jobTitle, d.name as departmentName, l.name as locationName
-    FROM personnel p
-    LEFT JOIN department d ON d.id = p.departmentID
-    LEFT JOIN location l ON l.id = d.locationID
-    WHERE 1=1';
+$query = 'SELECT p.id, p.lastName, p.firstName, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON d.id = p.departmentID LEFT JOIN location l ON l.id = d.locationID';
 
-if ($departmentID) {
-    $queryStr .= ' AND d.id = ?';
-}
-if ($locationID) {
-    $queryStr .= ' AND l.id = ?';
-}
-
-$query = $link->prepare($queryStr);
-
-if ($query === false) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "executed";
-    $output['status']['description'] = "query preparation failed: " . $link->error;
-    $output['data'] = [];
-    echo json_encode($output);
-    $link->close();
-    exit;
-}
-
+$conditions = [];
 $params = [];
 $types = '';
-if ($departmentID) {
+
+if ($departmentId) {
+    $conditions[] = 'd.id = ?';
+    $params[] = $departmentId;
     $types .= 'i';
-    $params[] = $departmentID;
 }
-if ($locationID) {
+
+if ($locationId) {
+    $conditions[] = 'l.id = ?';
+    $params[] = $locationId;
     $types .= 'i';
-    $params[] = $locationID;
 }
 
-if ($types) {
-    $query->bind_param($types, ...$params);
+if (count($conditions) > 0) {
+    $query .= ' WHERE ' . implode(' AND ', $conditions);
 }
 
-$query->execute();
+$query .= ' ORDER BY p.lastName, p.firstName, d.name, l.name';
 
-if ($query === false) {
+$stmt = $conn->prepare($query);
+
+if (false === $stmt) {
     $output['status']['code'] = "400";
-    $output['status']['name'] = "executed";
-    $output['status']['description'] = "query execution failed: " . $query->error;
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
-    $link->close();
+    $conn->close();
     exit;
 }
 
-$result = $query->get_result();
+if (count($params) > 0) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+
+if (false === $stmt) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Query execution failed: " . $stmt->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+
+$result = $stmt->get_result();
+if (false === $result) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failed";
+    $output['status']['description'] = "Result fetching failed: " . $stmt->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
 $data = [];
 
@@ -84,10 +108,10 @@ while ($row = mysqli_fetch_assoc($result)) {
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 $output['data'] = $data;
 
+$conn->close();
 echo json_encode($output);
-
-$link->close();
 
 ?>
