@@ -111,14 +111,6 @@ $(document).ready(function() {
         });
     }
 
-    function closeModalOnEsc() {
-        $(document).on('keydown', function(event) {
-            if (event.key === "Escape") {
-                $('.modal').modal('hide');
-            }
-        });
-    }
-
     $.when(
         populatePersonnel(),
         populateDepartments(),
@@ -937,7 +929,6 @@ $(document).ready(function() {
         });
     }
 
-    closeModalOnEsc();
     populatePersonnel();
     populateDepartments();
     populateLocations();
