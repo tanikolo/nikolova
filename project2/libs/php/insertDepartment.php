@@ -1,71 +1,100 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
+$executionStartTime = microtime(true);
+include(__DIR__ . "/config.php");
 
-	// remove next two lines for production
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+header('Content-Type: application/json; charset=UTF-8');
 
-	$executionStartTime = microtime(true);
-	
-	// this includes the login details
-	
-	include("config.php");
+if (!isset($host_name) || !isset($user_name) || !isset($password) || !isset($database)) {
+    echo json_encode([
+        'status' => [
+            'code' => '500',
+            'name' => 'failure',
+            'description' => 'Configuration variables are not set'
+        ],
+        'data' => []
+    ]);
+    exit;
+}
 
-	header('Content-Type: application/json; charset=UTF-8');
+$conn = new mysqli($host_name, $user_name, $password, $database);
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+if (mysqli_connect_errno()) {
+    $output['status']['code'] = "300";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "database unavailable";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    exit;
+}
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+$name = isset($_POST['name']) ? $conn->real_escape_string($_POST['name']) : '';
+$locationId = isset($_POST['locationId']) ? (int)$_POST['locationId'] : 0;
 
-		mysqli_close($conn);
+if (empty($name) || $locationId === 0) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "Invalid input data";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
-		echo json_encode($output);
+$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?, ?)');
+if ($query === false) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
 
-		exit;
+$query->bind_param("si", $name, $locationId);
+$query->execute();
 
-	}	
+if ($query->affected_rows > 0) {
+    $newId = $query->insert_id;
+    $query->close();
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+    $query = $conn->prepare('SELECT d.id, d.name, l.name as locationName FROM department d LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id = ?');
+    if ($query === false) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Query preparation failed: " . $conn->error;
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+        echo json_encode($output);
+        $conn->close();
+        exit;
+    }
 
-	$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?,?)');
+    $query->bind_param("i", $newId);
+    $query->execute();
+    $result = $query->get_result();
+    $data = $result->fetch_assoc();
 
-	$query->bind_param("si", $_REQUEST['name'], $_REQUEST['locationID']);
+    $output['status']['code'] = "200";
+    $output['status']['name'] = "ok";
+    $output['status']['description'] = "success";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = $data;
+} else {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "Query execution failed: " . $query->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+}
 
-	$query->execute();
-	
-	if (false === $query) {
+$query->close();
+$conn->close();
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
-
-		mysqli_close($conn);
-
-		echo json_encode($output); 
-
-		exit;
-
-	}
-
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
-	
-	mysqli_close($conn);
-
-	echo json_encode($output); 
+echo json_encode($output);
 
 ?>
