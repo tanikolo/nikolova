@@ -32,13 +32,12 @@
          </select>
       </span>
       <div id="map"></div>
-
       <!-- Country Overview Modal -->
-      <div id="modalInfo" class="modal" data-bs-backdrop="false" tabindex="-1">
+      <div id="modalInfo" class="modal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="modalInfoLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
                <div class="modal-header bg-info bg-gradient text-white">
-                  <h5 class="modal-title">Country Overview</h5>
+                  <h5 class="modal-title" id="modalInfoLabel">Country Overview</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body bg-color">
@@ -84,13 +83,12 @@
             </div>
          </div>
       </div>
-
       <!-- Wikipedia Information Modal -->
-      <div id="wikiModal" class="modal" tabindex="-1">
+      <div id="wikiModal" class="modal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="wikiModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
                <div class="modal-header bg-info bg-gradient text-white">
-                  <h5 class="modal-title" id="wikiTitle">Wikipedia Information</h5>
+                  <h5 class="modal-title" id="wikiModalLabel">Wikipedia Information</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body bg-color">
@@ -101,9 +99,8 @@
             </div>
          </div>
       </div>
-
       <!-- Weather Modal -->
-      <div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="weatherModalLabel" aria-hidden="true">
+      <div id="weatherModal" class="modal fade" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="weatherModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
                <div class="modal-header bg-info bg-gradient text-white">
@@ -180,13 +177,12 @@
             </div>
          </div>
       </div>
-
       <!-- Currency Calculator Modal -->
-      <div class="modal fade" id="currencyModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="currencyModalLabel" aria-hidden="true">
+      <div class="modal fade" id="currencyModal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="currencyModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content bg-info">
                <div class="modal-header border-0 bg-info text-white">
-                  <h5 class="modal-title">Currency calculator</h5>
+                  <h5 class="modal-title" id="currencyModalLabel">Currency calculator</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body bg-color">
@@ -211,9 +207,8 @@
             </div>
          </div>
       </div>
-
       <!-- Latest News Modal -->
-      <div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+      <div class="modal fade" id="newsModal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="newsModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content bg-info">
                <div class="modal-header border-0 bg-info text-white">
@@ -227,13 +222,12 @@
             </div>
          </div>
       </div>
-
       <!-- About Modal -->
-      <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+      <div class="modal fade" id="aboutModal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="aboutModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-md">
             <div class="modal-content bg-info">
                <div class="modal-header border-0 bg-info text-white">
-                  <h5 class="modal-title">About Gazetteer</h5>
+                  <h5 class="modal-title" id="aboutModalLabel">About Gazetteer</h5>
                   <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body text-justify bg-color">
@@ -243,13 +237,12 @@
             </div>
          </div>
       </div>
-
       <!-- Capital Information Modal -->
-      <div id="capitalModal" class="modal" tabindex="-1">
+      <div id="capitalModal" class="modal" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="capitalModalLabel" aria-hidden="true" tabindex="-1">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
                <div class="modal-header bg-info bg-gradient text-white text-center">
-                  <h5 class="modal-title" id="capitalTitle">Capital Information</h5>
+                  <h5 class="modal-title" id="capitalModalLabel">Capital Information</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body bg-color">
@@ -260,7 +253,6 @@
             </div>
          </div>
       </div>
-
       <script src="vendors/jquery/jquery-3.7.1.min.js"></script>
       <script src="vendors/bootstrap/js/bootstrap.bundle.min.js"></script>
       <script src="vendors/leaflet/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
