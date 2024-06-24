@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -61,19 +64,17 @@ if ($query === false) {
 $result = $query->get_result();
 $department = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = $result->fetch_assoc()) {
     array_push($department, $row);
 }
 
 $query->close();
 
-$query = 'SELECT id, name FROM location ORDER BY name';
-$result = $conn->query($query);
-
-if (!$result) {
+$query = $conn->prepare('SELECT id, name FROM location ORDER BY name');
+if ($query === false) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failure";
-    $output['status']['description'] = "Query failed: " . $conn->error;
+    $output['status']['description'] = "Query preparation failed: " . $conn->error;
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
@@ -81,11 +82,27 @@ if (!$result) {
     exit;
 }
 
+$query->execute();
+
+if ($query === false) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "Query execution failed: " . $query->error;
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+
+$result = $query->get_result();
 $locationOptions = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = $result->fetch_assoc()) {
     array_push($locationOptions, $row);
 }
+
+$query->close();
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
