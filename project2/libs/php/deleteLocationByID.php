@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
@@ -32,10 +34,10 @@ if ($locationId === 0) {
 }
 
 $checkQuery = $conn->prepare('SELECT COUNT(*) as count FROM department WHERE locationID = ?');
-if (false === $checkQuery) {
+if ($checkQuery === false) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failed";
-    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['description'] = "Query preparation failed";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
@@ -45,17 +47,8 @@ if (false === $checkQuery) {
 $checkQuery->bind_param("i", $locationId);
 $checkQuery->execute();
 $checkResult = $checkQuery->get_result();
-if (false === $checkResult) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Result fetching failed: " . $checkQuery->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
-    echo json_encode($output);
-    $conn->close();
-    exit;
-}
 $row = $checkResult->fetch_assoc();
+$checkQuery->close();
 
 if ($row['count'] > 0) {
     $output['status']['code'] = "403";
@@ -69,10 +62,10 @@ if ($row['count'] > 0) {
 }
 
 $query = $conn->prepare('DELETE FROM location WHERE id = ?');
-if (false === $query) {
+if ($query === false) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failed";
-    $output['status']['description'] = "Query preparation failed: " . $conn->error;
+    $output['status']['description'] = "Query preparation failed";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
@@ -89,6 +82,7 @@ if ($query->affected_rows === 0) {
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
+    $query->close();
     $conn->close();
     exit;
 }
@@ -99,6 +93,7 @@ $output['status']['description'] = "success";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 $output['data'] = [];
 
+$query->close();
 $conn->close();
 echo json_encode($output);
 ?>
