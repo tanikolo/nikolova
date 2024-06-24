@@ -39,14 +39,29 @@ $query = 'SELECT p.id, p.lastName, p.firstName, p.email, d.name as department, l
           LEFT JOIN location l ON l.id = d.locationID 
           ORDER BY p.lastName, p.firstName, d.name, l.name';
 
-$result = $conn->query($query);
+$stmt = $conn->prepare($query);
+
+if (!$stmt) {
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "query preparation failed: " . $conn->error;
+    $output['data'] = [];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 if (!$result) {
     $output['status']['code'] = "400";
-    $output['status']['name'] = "executed";
-    $output['status']['description'] = "query failed: " . $conn->error;
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "query execution failed: " . $conn->error;
     $output['data'] = [];
     echo json_encode($output);
+    $stmt->close();
     $conn->close();
     exit;
 }
@@ -65,5 +80,7 @@ $output['data'] = $data;
 
 echo json_encode($output);
 
+$stmt->close();
 $conn->close();
+
 ?>
