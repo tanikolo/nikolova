@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -47,13 +50,14 @@ if ($query === false) {
 $query->bind_param("i", $id);
 $query->execute();
 
-if ($query === false) {
+if ($query->error) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failure";
     $output['status']['description'] = "Query execution failed: " . $query->error;
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
+    $query->close();
     $conn->close();
     exit;
 }
@@ -61,7 +65,7 @@ if ($query === false) {
 $result = $query->get_result();
 $location = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = $result->fetch_assoc()) {
     array_push($location, $row);
 }
 
