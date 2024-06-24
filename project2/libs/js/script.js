@@ -49,8 +49,6 @@ $(document).ready(function() {
                     });
 
                     personnelTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -59,8 +57,8 @@ $(document).ready(function() {
             }
         });
     }
-  
-function populateDepartments() {
+
+    function populateDepartments() {
         $.ajax({
             url: 'libs/php/getAllDepartments.php',
             type: 'GET',
@@ -100,8 +98,6 @@ function populateDepartments() {
                     });
 
                     departmentTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -146,8 +142,6 @@ function populateDepartments() {
                     });
 
                     locationTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -159,7 +153,7 @@ function populateDepartments() {
 
     function searchPersonnel(searchText) {
         if (searchText.trim() === "") {
-            populatePersonnel(); 
+            populatePersonnel();
             return;
         }
 
@@ -213,8 +207,6 @@ function populateDepartments() {
                     });
 
                     personnelTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -226,7 +218,7 @@ function populateDepartments() {
 
     function searchDepartments(searchText) {
         if (searchText.trim() === "") {
-            populateDepartments(); 
+            populateDepartments();
             return;
         }
 
@@ -270,8 +262,6 @@ function populateDepartments() {
                     });
 
                     departmentTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -283,7 +273,7 @@ function populateDepartments() {
 
     function searchLocations(searchText) {
         if (searchText.trim() === "") {
-            populateLocations(); 
+            populateLocations();
             return;
         }
 
@@ -322,8 +312,6 @@ function populateDepartments() {
                     });
 
                     locationTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -332,7 +320,6 @@ function populateDepartments() {
             }
         });
     }
-
 
     function populateFilterModalOptions() {
         $.ajax({
@@ -348,8 +335,6 @@ function populateDepartments() {
                         const option = `<option value="${department.id}">${department.name}</option>`;
                         departmentSelect.append(option);
                     });
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -370,8 +355,6 @@ function populateDepartments() {
                         const option = `<option value="${location.id}">${location.name}</option>`;
                         locationSelect.append(option);
                     });
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -379,8 +362,8 @@ function populateDepartments() {
             }
         });
     }
-  
-  function populateAddModalOptions(type) {
+
+    function populateAddModalOptions(type) {
         if (type === "Personnel") {
             $.ajax({
                 url: 'libs/php/getAllDepartments.php',
@@ -395,8 +378,6 @@ function populateDepartments() {
                             const option = `<option value="${department.id}">${department.name}</option>`;
                             departmentSelect.append(option);
                         });
-                    } else {
-                        console.error('Error: ' + response.status.description);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -417,8 +398,6 @@ function populateDepartments() {
                             const option = `<option value="${location.id}">${location.name}</option>`;
                             locationSelect.append(option);
                         });
-                    } else {
-                        console.error('Error: ' + response.status.description);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -482,8 +461,6 @@ function populateDepartments() {
                     });
 
                     personnelTableBody.append(fragment);
-                } else {
-                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -500,13 +477,13 @@ function populateDepartments() {
 
     $("#filterPersonnelByDepartment").change(function () {
         if (this.value > 0) {
-            $("#filterPersonnelByLocation").val(0); 
+            $("#filterPersonnelByLocation").val(0);
         }
     });
 
     $("#filterPersonnelByLocation").change(function () {
         if (this.value > 0) {
-            $("#filterPersonnelByDepartment").val(0); 
+            $("#filterPersonnelByDepartment").val(0);
         }
     });
 
@@ -521,7 +498,6 @@ function populateDepartments() {
     $("#areYouSurePersonnelForm").on("submit", function (e) {
         e.preventDefault();
         const personnelId = $("#areYouSurePersonnelID").val();
-        console.log('Deleting personnel with ID:', personnelId);
 
         $.ajax({
             url: 'libs/php/deletePersonnelByID.php',
@@ -529,7 +505,6 @@ function populateDepartments() {
             data: { id: personnelId },
             dataType: 'json',
             success: function(response) {
-                console.log('deletePersonnelByID response:', response);
                 if (response.status.code === "200") {
                     $("#areYouSurePersonnelModal").modal('hide');
                     populatePersonnel();
@@ -543,10 +518,9 @@ function populateDepartments() {
         });
     });
 
-    $("#areYouSureDepartmentForm").on("submit", function (e) {
+    $("#areYouSureDepartmentForm").on("submit", function(e) {
         e.preventDefault();
         const departmentId = $("#areYouSureDeptID").val();
-        console.log('Deleting department with ID:', departmentId);
 
         $.ajax({
             url: 'libs/php/deleteDepartmentByID.php',
@@ -554,16 +528,15 @@ function populateDepartments() {
             data: { id: departmentId },
             dataType: 'json',
             success: function(response) {
-                console.log('deleteDepartmentByID response:', response);
                 if (response.status.code === "200") {
                     $("#areYouSureDeleteDepartmentModal").modal('hide');
                     populateDepartments();
                 } else {
-                    alert('Error: ' + response.status.description);
+                    console.error('Error: ' + response.status.description);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                alert('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                console.error('AJAX error: ' + textStatus + ' : ' + errorThrown);
             }
         });
     });
@@ -571,7 +544,6 @@ function populateDepartments() {
     $("#areYouSureLocationForm").on("submit", function (e) {
         e.preventDefault();
         const locationId = $("#areYouSureLocationID").val();
-        console.log('Deleting location with ID:', locationId);
 
         $.ajax({
             url: 'libs/php/deleteLocationByID.php',
@@ -579,7 +551,6 @@ function populateDepartments() {
             data: { id: locationId },
             dataType: 'json',
             success: function(response) {
-                console.log('deleteLocationByID response:', response);
                 if (response.status.code === "200") {
                     $("#areYouSureDeleteLocationModal").modal('hide');
                     populateLocations();
@@ -595,7 +566,6 @@ function populateDepartments() {
 
     $(document).on("click", ".deletePersonnelBtn", function () {
         const personnelId = $(this).attr("data-id");
-        console.log('deletePersonnelBtn clicked', personnelId);
 
         $.ajax({
             url: 'libs/php/getPersonnelByID.php',
@@ -603,14 +573,11 @@ function populateDepartments() {
             dataType: 'json',
             data: { id: personnelId },
             success: function (result) {
-                console.log('getPersonnelByID result:', result);
                 var resultCode = result.status.code;
                 if (resultCode == 200) {
                     $('#areYouSurePersonnelID').val(result.data.personnel[0].id);
                     $("#areYouSurePersonnelName").text(result.data["personnel"][0].firstName + " " + result.data["personnel"][0].lastName);
                     $("#areYouSurePersonnelModal").modal("show");
-                } else {
-                    $("#areYouSurePersonnelModal .modal-title").replaceWith("Error retrieving data");
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -619,17 +586,15 @@ function populateDepartments() {
         });
     });
 
-    $(document).on("click", ".deleteDepartmentBtn", function () {
+    $(document).on("click", ".deleteDepartmentBtn", function() {
         const departmentId = $(this).attr("data-id");
-        console.log('deleteDepartmentBtn clicked', departmentId);
 
         $.ajax({
             url: 'libs/php/checkDepartmentUse.php',
             type: 'POST',
             dataType: 'json',
             data: { id: departmentId },
-            success: function (result) {
-                console.log('checkDepartmentUse result:', result);
+            success: function(result) {
                 if (result.status.code == 200) {
                     if (result.data[0].personnelCount == 0) {
                         $('#areYouSureDeptID').val(departmentId);
@@ -640,8 +605,6 @@ function populateDepartments() {
                         $("#personnelCount").text(result.data[0].personnelCount);
                         $("#cantDeleteDepartmentModal").modal("show");
                     }
-                } else {
-                    console.log("Error retrieving data");
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -652,7 +615,6 @@ function populateDepartments() {
 
     $(document).on("click", ".deleteLocationBtn", function () {
         const locationId = $(this).attr("data-id");
-        console.log('deleteLocationBtn clicked', locationId);
 
         $.ajax({
             url: 'libs/php/checkLocationUse.php',
@@ -660,7 +622,6 @@ function populateDepartments() {
             dataType: 'json',
             data: { id: locationId },
             success: function (result) {
-                console.log('checkLocationUse result:', result);
                 if (result.status.code == 200) {
                     if (result.data[0].departmentCount == 0) {
                         $('#areYouSureLocationID').val(locationId);
@@ -1048,17 +1009,17 @@ function populateDepartments() {
 
     $("#personnelBtn").click(function () {
         $("#filterBtn").attr("disabled", false);
-        populatePersonnel(); 
+        populatePersonnel();
     });
 
     $("#departmentsBtn").click(function () {
         $("#filterBtn").attr("disabled", true);
-        populateDepartments(); 
+        populateDepartments();
     });
 
     $("#locationsBtn").click(function () {
         $("#filterBtn").attr("disabled", true);
-        populateLocations(); 
+        populateLocations();
     });
 
     $('#addPersonnelModal, #editPersonnelModal, #addDepartmentModal, #editDepartmentModal, #addLocationModal, #editLocationModal').on('hidden.bs.modal', function () {
