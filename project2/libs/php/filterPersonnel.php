@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -101,7 +104,7 @@ if (false === $result) {
 
 $data = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = $result->fetch_assoc()) {
     array_push($data, $row);
 }
 
