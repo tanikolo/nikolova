@@ -196,10 +196,13 @@
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
+                  <form id="areYouSureDepartmentForm">
+                     <input id="areYouSureDeptID" type="hidden">
+                  </form>
                   Are you sure that you want to remove the entry for <span id="areYouSureDeptName" class="fw-bold"></span>?
                </div>
                <div class="modal-footer">
-                  <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">YES</button>
+                  <button type="submit" form="areYouSureDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">YES</button>
                   <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
                </div>
             </div>
