@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -30,7 +33,11 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$query = 'SELECT p.id, p.lastName, p.firstName, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON d.id = p.departmentID LEFT JOIN location l ON l.id = d.locationID ORDER BY p.lastName, p.firstName, d.name, l.name';
+$query = 'SELECT p.id, p.lastName, p.firstName, p.email, d.name as department, l.name as location 
+          FROM personnel p 
+          LEFT JOIN department d ON d.id = p.departmentID 
+          LEFT JOIN location l ON l.id = d.locationID 
+          ORDER BY p.lastName, p.firstName, d.name, l.name';
 
 $result = $conn->query($query);
 
@@ -46,8 +53,8 @@ if (!$result) {
 
 $data = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
-    array_push($data, $row);
+while ($row = $result->fetch_assoc()) {
+    $data[] = $row;
 }
 
 $output['status']['code'] = "200";
