@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 include(__DIR__ . "/config.php");
@@ -29,7 +31,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$name = isset($_POST['name']) ? $conn->real_escape_string($_POST['name']) : '';
+$name = isset($_POST['name']) ? trim($_POST['name']) : '';
 
 if (empty($name)) {
     $output['status']['code'] = "400";
