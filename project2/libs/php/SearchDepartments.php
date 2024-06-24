@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -9,40 +12,72 @@ header('Content-Type: application/json; charset=UTF-8');
 $conn = new mysqli($host_name, $user_name, $password, $database);
 
 if (mysqli_connect_errno()) {
-    $output['status']['code'] = "300";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "database unavailable";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "300",
+            'name' => "failure",
+            'description' => "database unavailable",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     exit;
 }
 
-$searchText = isset($_POST['txt']) ? '%' . $conn->real_escape_string($_POST['txt']) . '%' : '%';
+$txt = isset($_GET['query']) ? $conn->real_escape_string($_GET['query']) : '';
 
-$query = $conn->prepare('SELECT d.id, d.name, l.name as locationName FROM department d LEFT JOIN location l ON d.locationID = l.id WHERE d.name LIKE ? OR l.name LIKE ? ORDER BY d.name, l.name');
-
-if (false === $query) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Query preparation failed: " . $conn->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+if (empty($txt)) {
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failed",
+            'description' => "Missing or empty search text",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     $conn->close();
     exit;
 }
 
-$query->bind_param('ss', $searchText, $searchText);
+$query = $conn->prepare('SELECT d.id, d.name, l.name AS locationName 
+                         FROM department d 
+                         LEFT JOIN location l ON (l.id = d.locationID) 
+                         WHERE d.name LIKE ? OR l.name LIKE ? 
+                         ORDER BY d.name, l.name');
+
+if (false === $query) {
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failed",
+            'description' => "Query preparation failed: " . $conn->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
+    echo json_encode($output);
+    $conn->close();
+    exit;
+}
+
+$likeText = "%" . $txt . "%";
+$query->bind_param("ss", $likeText, $likeText);
 
 $query->execute();
 
 if (false === $query) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Query execution failed: " . $query->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failed",
+            'description' => "Query execution failed: " . $query->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     $conn->close();
     exit;
@@ -50,27 +85,35 @@ if (false === $query) {
 
 $result = $query->get_result();
 if (false === $result) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Result fetching failed: " . $query->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failed",
+            'description' => "Result fetching failed: " . $query->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     $conn->close();
     exit;
 }
 
-$data = [];
+$found = [];
 
 while ($row = mysqli_fetch_assoc($result)) {
-    array_push($data, $row);
+    array_push($found, $row);
 }
 
-$output['status']['code'] = "200";
-$output['status']['name'] = "ok";
-$output['status']['description'] = "success";
-$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-$output['data'] = $data;
+$output = [
+    'status' => [
+        'code' => "200",
+        'name' => "ok",
+        'description' => "success",
+        'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+    ],
+    'data' => ['found' => $found]
+];
 
 echo json_encode($output);
 
