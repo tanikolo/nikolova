@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
@@ -24,43 +26,6 @@ if ($departmentId === 0) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failed";
     $output['status']['description'] = "Invalid department ID";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
-    echo json_encode($output);
-    $conn->close();
-    exit;
-}
-
-$checkQuery = $conn->prepare('SELECT COUNT(*) as count FROM personnel WHERE departmentID = ?');
-if (false === $checkQuery) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Query preparation failed: " . $conn->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
-    echo json_encode($output);
-    $conn->close();
-    exit;
-}
-$checkQuery->bind_param("i", $departmentId);
-$checkQuery->execute();
-$checkResult = $checkQuery->get_result();
-if (false === $checkResult) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failed";
-    $output['status']['description'] = "Result fetching failed: " . $checkQuery->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
-    echo json_encode($output);
-    $conn->close();
-    exit;
-}
-$row = $checkResult->fetch_assoc();
-
-if ($row['count'] > 0) {
-    $output['status']['code'] = "403";
-    $output['status']['name'] = "forbidden";
-    $output['status']['description'] = "Cannot delete department with assigned personnel";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
     echo json_encode($output);
