@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -21,24 +24,32 @@ if (!isset($host_name) || !isset($user_name) || !isset($password) || !isset($dat
 $conn = new mysqli($host_name, $user_name, $password, $database);
 
 if (mysqli_connect_errno()) {
-    $output['status']['code'] = "300";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "database unavailable";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "300",
+            'name' => "failure",
+            'description' => "database unavailable",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     exit;
 }
 
 $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-$name = isset($_POST['name']) ? $conn->real_escape_string($_POST['name']) : '';
+$name = isset($_POST['name']) ? trim($_POST['name']) : '';
 
 if (empty($name) || $id === 0) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "Invalid input data";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failure",
+            'description' => "Invalid input data",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     $conn->close();
     exit;
@@ -46,11 +57,15 @@ if (empty($name) || $id === 0) {
 
 $query = $conn->prepare('UPDATE location SET name = ? WHERE id = ?');
 if ($query === false) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "Query preparation failed: " . $conn->error;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failure",
+            'description' => "Query preparation failed: " . $conn->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
     echo json_encode($output);
     $conn->close();
     exit;
@@ -60,17 +75,25 @@ $query->bind_param("si", $name, $id);
 $query->execute();
 
 if ($query->affected_rows === 0) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "No rows updated";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "400",
+            'name' => "failure",
+            'description' => "No rows updated",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
 } else {
-    $output['status']['code'] = "200";
-    $output['status']['name'] = "ok";
-    $output['status']['description'] = "success";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
+    $output = [
+        'status' => [
+            'code' => "200",
+            'name' => "ok",
+            'description' => "success",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ];
 }
 
 $query->close();
