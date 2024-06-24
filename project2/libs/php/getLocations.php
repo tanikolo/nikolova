@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -20,7 +23,7 @@ if (!isset($host_name) || !isset($user_name) || !isset($password) || !isset($dat
 
 $conn = new mysqli($host_name, $user_name, $password, $database);
 
-if (mysqli_connect_errno()) {
+if ($conn->connect_errno) {
     echo json_encode([
         'status' => [
             'code' => '300',
@@ -35,14 +38,14 @@ if (mysqli_connect_errno()) {
 
 $query = 'SELECT id, name FROM location ORDER BY name';
 
-$result = $conn->query($query);
+$stmt = $conn->prepare($query);
 
-if (!$result) {
+if (!$stmt) {
     echo json_encode([
         'status' => [
             'code' => '400',
             'name' => 'failure',
-            'description' => 'query failed: ' . $conn->error,
+            'description' => 'query preparation failed: ' . $conn->error,
             'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
         ],
         'data' => []
@@ -51,10 +54,29 @@ if (!$result) {
     exit;
 }
 
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+if (!$result) {
+    echo json_encode([
+        'status' => [
+            'code' => '400',
+            'name' => 'failure',
+            'description' => 'query execution failed: ' . $stmt->error,
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
+        ],
+        'data' => []
+    ]);
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
 $data = [];
 
-while ($row = mysqli_fetch_assoc($result)) {
-    array_push($data, $row);
+while ($row = $result->fetch_assoc()) {
+    $data[] = $row;
 }
 
 echo json_encode([
@@ -67,6 +89,7 @@ echo json_encode([
     'data' => $data
 ]);
 
+$stmt->close();
 $conn->close();
 
 ?>
