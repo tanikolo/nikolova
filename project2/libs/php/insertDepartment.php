@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 include(__DIR__ . "/config.php");
@@ -29,7 +31,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$name = isset($_POST['name']) ? $conn->real_escape_string($_POST['name']) : '';
+$name = isset($_POST['name']) ? trim($_POST['name']) : '';
 $locationId = isset($_POST['locationId']) ? (int)$_POST['locationId'] : 0;
 
 if (empty($name) || $locationId === 0) {
@@ -62,7 +64,7 @@ if ($query->affected_rows > 0) {
     $newId = $query->insert_id;
     $query->close();
 
-    $query = $conn->prepare('SELECT d.id, d.name, l.name as locationName FROM department d LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id = ?');
+    $query = $conn->prepare('SELECT d.id, d.name, l.name as locationName FROM department d LEFT JOIN location l ON l.id = d.locationID WHERE d.id = ?');
     if ($query === false) {
         $output['status']['code'] = "400";
         $output['status']['name'] = "failure";
