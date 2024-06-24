@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 $executionStartTime = microtime(true);
 
 include(__DIR__ . "/config.php");
@@ -31,7 +34,7 @@ if (mysqli_connect_errno()) {
 }
 
 $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-$name = isset($_POST['name']) ? $conn->real_escape_string($_POST['name']) : '';
+$name = isset($_POST['name']) ? trim($_POST['name']) : '';
 $locationID = isset($_POST['locationID']) ? intval($_POST['locationID']) : 0;
 
 if (empty($name) || $locationID === 0 || $id === 0) {
