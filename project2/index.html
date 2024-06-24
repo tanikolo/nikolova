@@ -118,12 +118,11 @@
             <p class="fw-light my-3">Company Directory version 1.0</p>
          </footer>
       </section>
-      <!-- Filter Personnel Modal -->
-      <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="filterPersonnelModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content shadow">
+      <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content modal-sm shadow">
                <div class="modal-header bg-primary bg-gradient text-white">
-                  <h5 class="modal-title" id="filterPersonnelModalLabel">Filter Employees</h5>
+                  <h5 class="modal-title">Filter employees</h5>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
@@ -131,20 +130,21 @@
                      <div class="form-floating mb-3">
                         <select class="form-select" id="filterPersonnelByDepartment" placeholder="Department">
                            <option value="0">All Departments</option>
+                           <option value="12">Business Development</option>
                         </select>
-                        <label for="filterPersonnelByDepartment">Filter by Department</label>
+                        <label for="filterPersonnelByDepartment">Department</label>
                      </div>
                      <div class="form-floating">
                         <select class="form-select" id="filterPersonnelByLocation" placeholder="Location">
                            <option value="0">All Locations</option>
+                           <option value="1">London</option>
                         </select>
-                        <label for="filterPersonnelByLocation">Filter by Location</label>
+                        <label for="filterPersonnelByLocation">Location</label>
                      </div>
                   </form>
                </div>
                <div class="modal-footer">
-                  <button type="submit" form="filterPersonnelForm" class="btn btn-outline-primary btn-sm myBtn">APPLY</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CLOSE</button>
                </div>
             </div>
          </div>
