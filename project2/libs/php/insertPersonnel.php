@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 include(__DIR__ . "/config.php");
@@ -29,10 +31,10 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$firstName = isset($_POST['firstName']) ? $conn->real_escape_string($_POST['firstName']) : '';
-$lastName = isset($_POST['lastName']) ? $conn->real_escape_string($_POST['lastName']) : '';
-$jobTitle = isset($_POST['jobTitle']) ? $conn->real_escape_string($_POST['jobTitle']) : '';
-$email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
+$firstName = isset($_POST['firstName']) ? trim($_POST['firstName']) : '';
+$lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
+$jobTitle = isset($_POST['jobTitle']) ? trim($_POST['jobTitle']) : '';
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $departmentId = isset($_POST['departmentId']) ? intval($_POST['departmentId']) : 0;
 
 if (empty($firstName) || empty($lastName) || empty($jobTitle) || empty($email) || $departmentId === 0) {
