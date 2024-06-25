@@ -447,28 +447,28 @@ $(document).ready(function() {
     }
 
     $("#areYouSurePersonnelForm").on("submit", function (e) {
-        e.preventDefault();
-        const personnelId = $("#areYouSurePersonnelID").val();
+    e.preventDefault();
+    const personnelId = $("#areYouSurePersonnelID").val();
 
-        $.ajax({
-            url: 'libs/php/deletePersonnelByID.php',
-            type: 'POST',
-            data: { id: personnelId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status.code === "200") {
-                    $("#areYouSurePersonnelModal").modal('hide');
-                    populatePersonnel();
-                } else {
-                    alert('Error: ' + response.status.description);
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert('AJAX error: ' + textStatus + ' : ' + errorThrown);
+    $.ajax({
+        url: 'libs/php/deletePersonnelByID.php',
+        type: 'POST',
+        data: { id: personnelId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status.code === "200") {
+                $("#areYouSurePersonnelModal").modal('hide');
+                populatePersonnel();
+            } else {
+                alert('Error: ' + response.status.description);
             }
-        });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('AJAX error: ' + textStatus + ' : ' + errorThrown);
+        }
     });
-
+});
+    
     $("#areYouSureDepartmentForm").on("submit", function(e) {
         e.preventDefault();
         const departmentId = $("#areYouSureDeptID").val();
@@ -515,29 +515,31 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on("click", ".deletePersonnelBtn", function () {
-        const personnelId = $(this).attr("data-id");
+    $(document).on("click", ".deletePersonnelBtn", function() {
+    const personnelId = $(this).attr("data-id");
 
-        $.ajax({
-            url: 'libs/php/getPersonnelByID.php',
-            type: 'POST',
-            dataType: 'json',
-            data: { id: personnelId },
-            success: function (result) {
-                const resultCode = result.status.code;
-                if (resultCode == 200) {
-                    $('#areYouSurePersonnelID').val(result.data.personnel[0].id);
-                    $("#areYouSurePersonnelName").text(result.data["personnel"][0].firstName + " " + result.data["personnel"][0].lastName);
-                    $("#areYouSurePersonnelModal").modal("show");
-                } else {
-                    $("#areYouSurePersonnelModal .modal-title").replaceWith("Error retrieving data");
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $("#deleteEmployeeName .modal-title").replaceWith("Error retrieving data");
+    $.ajax({
+        url: 'libs/php/getPersonnelByID.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { id: personnelId },
+        success: function(result) {
+            const resultCode = result.status.code;
+            if (resultCode === "200") {
+                const personnel = result.data.personnel[0];
+                $('#areYouSurePersonnelID').val(personnel.id); 
+                $("#areYouSurePersonnelName").text(personnel.firstName + " " + personnel.lastName);
+                $("#areYouSurePersonnelModal").modal("show");
+            } else {
+                $("#areYouSurePersonnelModal .modal-title").text("Error retrieving data");
             }
-        });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#areYouSurePersonnelModal .modal-title").text("Error retrieving data");
+        }
     });
+});
+
 
     $(document).on("click", ".deleteDepartmentBtn", function() {
         const departmentId = $(this).attr("data-id");
