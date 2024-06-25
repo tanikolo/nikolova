@@ -150,26 +150,27 @@
          </div>
       </div>
       <!-- Are You Sure Personnel Modal -->
-      <div id="areYouSurePersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="areYouSurePersonnelModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content shadow">
-               <div class="modal-header bg-primary bg-gradient text-white">
-                  <h5 class="modal-title" id="areYouSurePersonnelModalLabel">Remove Employee Entry?</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                  <form id="areYouSurePersonnelForm">
-                     <input id="areYouSurePersonnelID" type="hidden">
-                  </form>
-                  Are you sure that you want to remove the entry for <span id="areYouSurePersonnelName" class="fw-bold"></span>?
-               </div>
-               <div class="modal-footer">
-                  <button type="submit" form="areYouSurePersonnelForm" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">YES</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
-               </div>
+<div id="areYouSurePersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="areYouSurePersonnelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary bg-gradient text-white">
+                <h5 class="modal-title" id="areYouSurePersonnelModalLabel">Remove Employee Entry?</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-         </div>
-      </div>
+            <div class="modal-body">
+                <form id="areYouSurePersonnelForm">
+                    <input id="areYouSurePersonnelID" type="hidden"> <!-- Hidden input for personnel ID -->
+                </form>
+                Are you sure that you want to remove the entry for <span id="areYouSurePersonnelName" class="fw-bold"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="areYouSurePersonnelForm" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">YES</button>
+                <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
+            </div>
+        </div>
+    </div>
+</div>
+
       <!-- Can't Delete Department Modal -->
       <div id="cantDeleteDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="cantDeleteDepartmentModalLabel" aria-hidden="true">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
